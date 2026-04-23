@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
+using Setting.Model;
 
-namespace Setting
+namespace Setting.Converter
 {
-    class SynthesisSettingModeToBool : IValueConverter
+    internal sealed class SynthesisSettingModeToBool : IValueConverter
     {
         // ConverterParameterをEnumに変換するメソッド
         private SynthesisSettingMode ConvertFromConverterParameter(object parameter)
@@ -30,7 +31,9 @@ namespace Setting
             // true→falseの変化は無視する
             // ※こうすることで、選択されたラジオボタンだけをデータに反映させる
             if (!(bool)value)
+            {
                 return System.Windows.DependencyProperty.UnsetValue;
+            }
 
             // ConverterParameterをEnumに変換して返す
             return ConvertFromConverterParameter(parameter);

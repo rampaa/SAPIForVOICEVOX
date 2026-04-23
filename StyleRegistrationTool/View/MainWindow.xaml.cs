@@ -1,20 +1,21 @@
-﻿using SFVvCommon;
-using StyleRegistrationTool.ViewModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
+using SFVvCommon;
+using StyleRegistrationTool.ViewModel;
 
-namespace StyleRegistrationTool
+namespace StyleRegistrationTool.View
 {
     /// <summary>
     /// MainWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class MainWindow : Window
+    public sealed partial class MainWindow : Window
     {
-        MainViewModel viewModel;
+        private MainViewModel viewModel;
 
         public MainWindow()
         {
@@ -25,11 +26,11 @@ namespace StyleRegistrationTool
 #else
             string bitStr = "32bit版";
 #endif
-            this.Title += bitStr;
+            Title += bitStr;
 
             viewModel = new MainViewModel(this);
-            this.DataContext = viewModel;
-            this.Loaded += viewModel.MainWindow_Loaded;
+            DataContext = viewModel;
+            Loaded += viewModel.MainWindow_Loaded;
         }
 
         /// <summary>
@@ -39,7 +40,7 @@ namespace StyleRegistrationTool
         {
             get
             {
-                var helper = new System.Windows.Interop.WindowInteropHelper(this);
+                WindowInteropHelper helper = new WindowInteropHelper(this);
                 return helper.Handle;
             }
         }
@@ -110,9 +111,9 @@ namespace StyleRegistrationTool
             }
             columnHeader.Content = columnHeaderString;
             //自分以外のヘッダーから▼マークを削除
-            List<GridViewColumnHeader> columnHeaders = new List<GridViewColumnHeader>() { AppNameHeader, NameHeader, StyleNameHeader, IDHeader, PortHeader };
+            List<GridViewColumnHeader> columnHeaders = new List<GridViewColumnHeader> { AppNameHeader, NameHeader, StyleNameHeader, IDHeader, PortHeader };
             columnHeaders.Remove(columnHeader);
-            foreach (var item in columnHeaders)
+            foreach (GridViewColumnHeader item in columnHeaders)
             {
                 string headerString = item.Content.ToString();
                 headerString = headerString.Replace("▲", "");

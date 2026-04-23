@@ -5,7 +5,7 @@ namespace StyleRegistrationTool
     /// <summary>
     /// App.xaml の相互作用ロジック
     /// </summary>
-    public partial class App : Application
+    public sealed partial class App : Application
     {
     }
 }

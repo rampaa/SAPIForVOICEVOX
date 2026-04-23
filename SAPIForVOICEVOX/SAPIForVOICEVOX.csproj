@@ -141,10 +141,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Exception\VoiceNotificationException.cs" />
-    <Compile Include="Exception\VoiceVoxConnectionException.cs" />
-    <Compile Include="Exception\VoiceVoxEngineException.cs" />
-    <Compile Include="Exception\VoiceVoxNotFoundException.cs" />
+    <Compile Include="Exceptions\VoiceNotificationException.cs" />
+    <Compile Include="Exceptions\VoiceVoxConnectionException.cs" />
+    <Compile Include="Exceptions\VoiceVoxEngineException.cs" />
+    <Compile Include="Exceptions\VoiceVoxNotFoundException.cs" />
     <Compile Include="VoiceVoxTTSEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

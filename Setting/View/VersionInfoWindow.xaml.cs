@@ -7,7 +7,7 @@ namespace Setting.View
     /// <summary>
     /// VersionInfoWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class VersionInfoWindow : Window
+    public sealed partial class VersionInfoWindow : Window
     {
         public VersionInfoWindow()
         {
@@ -20,7 +20,7 @@ namespace Setting.View
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)

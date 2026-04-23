@@ -1,8 +1,7 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using NAudio.Wave;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Setting;
 using SFVvCommon;
 using System;
 using System.Collections.Generic;
@@ -14,46 +13,49 @@ using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using SAPIForVOICEVOX.EnglishToKana;
+using SAPIForVOICEVOX.Exceptions;
+using Setting.Model;
+using Setting.ViewModel;
 using TTSEngineLib;
 
 namespace SAPIForVOICEVOX
 {
-    [Guid(Common.guidString)]
+    [Guid(Common.GuidString)]
     [ComVisible(true)]
     [ClassInterface(ClassInterfaceType.None)]
     public class VoiceVoxTTSEngine : ISpTTSEngine, ISpObjectWithToken
     {
         #region ネイティブ
 
-        const ushort WAVE_FORMAT_PCM = 1;
+        private const ushort WAVE_FORMAT_PCM = 1;
 
         //SPDFID_WaveFormatExの値は、ヘッダーファイルで定義さていなくて、不明である。
         //したがって、C++コードで値を返す関数を定義しDLLとして出力し、使用することにした。
         [DllImport("SAPIGetStaticValueLib.dll")]
-        static extern Guid GetSPDFIDWaveFormatEx();
+        private static extern Guid GetSPDFIDWaveFormatEx();
         //同上
         [DllImport("SAPIGetStaticValueLib.dll")]
-        static extern Guid GetSPDFIDText();
+        private static extern Guid GetSPDFIDText();
 
         /// <summary>
         /// SPVESACTIONSは、ISpTTSEngineSite :: GetActions呼び出しによって返される値をリストします。これらの値から、TTSエンジンは、アプリケーションによって行われたリアルタイムのアクション要求を受信します。
         /// </summary>
         [Flags]
-        enum SPVESACTIONS
+        private enum SPVESACTIONS
         {
             SPVES_CONTINUE = 0,
-            SPVES_ABORT = (1 << 0),
-            SPVES_SKIP = (1 << 1),
-            SPVES_RATE = (1 << 2),
-            SPVES_VOLUME = (1 << 3)
+            SPVES_ABORT = 1 << 0,
+            SPVES_SKIP = 1 << 1,
+            SPVES_RATE = 1 << 2,
+            SPVES_VOLUME = 1 << 3
         }
 
         /// <summary>
         /// SPEVENTENUMは、SAPIから可能なイベントを一覧表示します。
         /// </summary>
-        enum SPEVENTENUM
+        private enum SPEVENTENUM
         {
             SPEI_UNDEFINED = 0,
             SPEI_START_INPUT_STREAM = 1,
@@ -99,22 +101,23 @@ namespace SAPIForVOICEVOX
 
         //SPEVENTENUMはフラグを直接定義しているのではなく、フラグの位置を定義してるらしい？
         //SPFEIマクロを使用して変換する必要がある？
-        const ulong SPFEI_FLAGCHECK = (1u << (int)SPEVENTENUM.SPEI_RESERVED1) | (1u << (int)SPEVENTENUM.SPEI_RESERVED2);
-        const ulong SPFEI_ALL_TTS_EVENTS = 0x000000000000FFFEul | SPFEI_FLAGCHECK;
-        const ulong SPFEI_ALL_SR_EVENTS = 0x003FFFFC00000000ul | SPFEI_FLAGCHECK;
-        const ulong SPFEI_ALL_EVENTS = 0xEFFFFFFFFFFFFFFFul;
-        ulong SPFEI(SPEVENTENUM SPEI_ord)
+        private const ulong SPFEI_FLAGCHECK = (1u << (int)SPEVENTENUM.SPEI_RESERVED1) | (1u << (int)SPEVENTENUM.SPEI_RESERVED2);
+        private const ulong SPFEI_ALL_TTS_EVENTS = 0x000000000000FFFEul | SPFEI_FLAGCHECK;
+        private const ulong SPFEI_ALL_SR_EVENTS = 0x003FFFFC00000000ul | SPFEI_FLAGCHECK;
+        private const ulong SPFEI_ALL_EVENTS = 0xEFFFFFFFFFFFFFFFul;
+
+        private ulong SPFEI(SPEVENTENUM SPEI_ord)
         {
             return (1ul << (int)SPEI_ord) | SPFEI_FLAGCHECK;
         }
 
-        enum SPEVENTLPARAMTYPE
+        private enum SPEVENTLPARAMTYPE
         {
             SPET_LPARAM_IS_UNDEFINED = 0,
-            SPET_LPARAM_IS_TOKEN = (SPET_LPARAM_IS_UNDEFINED + 1),
-            SPET_LPARAM_IS_OBJECT = (SPET_LPARAM_IS_TOKEN + 1),
-            SPET_LPARAM_IS_POINTER = (SPET_LPARAM_IS_OBJECT + 1),
-            SPET_LPARAM_IS_STRING = (SPET_LPARAM_IS_POINTER + 1)
+            SPET_LPARAM_IS_TOKEN = SPET_LPARAM_IS_UNDEFINED + 1,
+            SPET_LPARAM_IS_OBJECT = SPET_LPARAM_IS_TOKEN + 1,
+            SPET_LPARAM_IS_POINTER = SPET_LPARAM_IS_OBJECT + 1,
+            SPET_LPARAM_IS_STRING = SPET_LPARAM_IS_POINTER + 1
         }
 
         #endregion
@@ -123,35 +126,35 @@ namespace SAPIForVOICEVOX
         /// <summary>
         /// キャラ番号
         /// </summary>
-        int SpeakerNumber { get; set; } = 0;
+        private int SpeakerNumber { get; set; }
 
         /// <summary>
         /// ポート番号
         /// </summary>
-        int Port { get; set; } = 50021;
+        private int Port { get; set; } = 50021;
 
         /// <summary>
         /// トークン
         /// </summary>
-        ISpObjectToken Token { get; set; }
+        private ISpObjectToken Token { get; set; }
 
         /// <summary>
         /// 唯一のhttpクライアント
         /// </summary>
-        HttpClient httpClient;
+        private readonly HttpClient _httpClient;
 
         /// <summary>
         /// 英語カナ辞書
         /// </summary>
-        EnglishKanaDictionary engKanaDict;
+        private readonly EnglishKanaDictionary _engKanaDict;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         public VoiceVoxTTSEngine()
         {
-            httpClient = new HttpClient();
-            engKanaDict = new EnglishKanaDictionary();
+            _httpClient = new HttpClient();
+            _engKanaDict = new EnglishKanaDictionary();
         }
 
         /// <summary>
@@ -184,7 +187,7 @@ namespace SAPIForVOICEVOX
                 SAPIspeed = Map(tempInt, 0, 10, 1.0, 2.0);
             }
             pOutputSite.GetVolume(out ushort tempUshort);
-            double SAPIvolume = Map(tempUshort, 0, 100, 0.0, 1.0);
+            double sAPIvolume = Map(tempUshort, 0, 100, 0.0, 1.0);
 
             //設定アプリのデータ取得
             GetSettingData(SpeakerNumber, out GeneralSetting generalSetting, out SynthesisParameter synthesisParameter);
@@ -193,7 +196,7 @@ namespace SAPIForVOICEVOX
             if (synthesisParameter.ValueMode == ParameterValueMode.SAPI)
             {
                 speed = SAPIspeed;
-                volume = SAPIvolume;
+                volume = sAPIvolume;
             }
             else
             {
@@ -238,7 +241,7 @@ namespace SAPIForVOICEVOX
                     text = text.Substring(0, (int)currentTextList.ulTextLen);
 
                     SendToDebugConsole(text);
-                    
+
                     //分割
                     string[] splitedString;
                     if (charSeparators.Count() == 0)
@@ -266,7 +269,7 @@ namespace SAPIForVOICEVOX
                         }
 
                         //英単語をカナへ置換
-                        string replaceString = engKanaDict.ReplaceEnglishToKana(str);
+                        string replaceString = _engKanaDict.ReplaceEnglishToKana(str);
 
                         //VOICEVOXへ送信
                         //asyncメソッドにはref引数を指定できないらしいので、awaitも使用できない。awaitを使用しない実装にした。
@@ -296,7 +299,7 @@ namespace SAPIForVOICEVOX
                         using (WaveFileReader reader = new WaveFileReader(stream))
                         {
                             WaveFormat waveFormat = new WaveFormat((int)pWaveFormatEx.nSamplesPerSec, pWaveFormatEx.wBitsPerSample, pWaveFormatEx.nChannels);
-                            using (var resampler = new MediaFoundationResampler(reader, waveFormat))
+                            using (MediaFoundationResampler resampler = new MediaFoundationResampler(reader, waveFormat))
                             {
                                 //書き込み
                                 writtenWavLength += OutputSiteWriteSafe(pOutputSite, resampler);
@@ -304,7 +307,7 @@ namespace SAPIForVOICEVOX
                         }
                     }
 
-                //次のデータを設定
+                    //次のデータを設定
                 SetNextData:
                     if (currentTextList.pNext == IntPtr.Zero)
                     {
@@ -325,14 +328,14 @@ namespace SAPIForVOICEVOX
                 using (WaveFileReader reader = new WaveFileReader(stream))
                 {
                     WaveFormat waveFormat = new WaveFormat((int)pWaveFormatEx.nSamplesPerSec, pWaveFormatEx.wBitsPerSample, pWaveFormatEx.nChannels);
-                    using (var resampler = new MediaFoundationResampler(reader, waveFormat))
+                    using (MediaFoundationResampler resampler = new MediaFoundationResampler(reader, waveFormat))
                     {
                         //書き込み
-                        OutputSiteWriteSafe(pOutputSite, resampler);
+                        _ = OutputSiteWriteSafe(pOutputSite, resampler);
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
@@ -383,7 +386,8 @@ namespace SAPIForVOICEVOX
             {
                 //メモリが確実に確保され、確実に代入されるためのおまじない。
                 RuntimeHelpers.PrepareConstrainedRegions();
-                try { }
+                try
+                { }
                 finally
                 {
                     pWavData = Marshal.AllocCoTaskMem(data.Length);
@@ -423,23 +427,27 @@ namespace SAPIForVOICEVOX
             //SPEI_SENTENCE_BOUNDARYとWORD_BOUNDARY_EVENTにのみ対応
             if ((ulongValue & SPFEI(SPEVENTENUM.SPEI_SENTENCE_BOUNDARY)) == SPFEI(SPEVENTENUM.SPEI_SENTENCE_BOUNDARY))
             {
-                SPEVENT SENTENCE_BOUNDARY_EVENT = new SPEVENT();
-                SENTENCE_BOUNDARY_EVENT.eEventId = (ushort)SPEVENTENUM.SPEI_SENTENCE_BOUNDARY;
-                SENTENCE_BOUNDARY_EVENT.elParamType = (ushort)SPEVENTLPARAMTYPE.SPET_LPARAM_IS_UNDEFINED;
-                SENTENCE_BOUNDARY_EVENT.wParam = wParam;
-                SENTENCE_BOUNDARY_EVENT.lParam = lParam;
-                SENTENCE_BOUNDARY_EVENT.ullAudioStreamOffset = writtenWavLength;
+                SPEVENT SENTENCE_BOUNDARY_EVENT = new SPEVENT
+                {
+                    eEventId = (ushort)SPEVENTENUM.SPEI_SENTENCE_BOUNDARY,
+                    elParamType = (ushort)SPEVENTLPARAMTYPE.SPET_LPARAM_IS_UNDEFINED,
+                    wParam = wParam,
+                    lParam = lParam,
+                    ullAudioStreamOffset = writtenWavLength
+                };
 
                 sPEVENTList.Add(SENTENCE_BOUNDARY_EVENT);
             }
             if ((ulongValue & SPFEI(SPEVENTENUM.SPEI_WORD_BOUNDARY)) == SPFEI(SPEVENTENUM.SPEI_WORD_BOUNDARY))
             {
-                SPEVENT WORD_BOUNDARY_EVENT = new SPEVENT();
-                WORD_BOUNDARY_EVENT.eEventId = (ushort)SPEVENTENUM.SPEI_WORD_BOUNDARY;
-                WORD_BOUNDARY_EVENT.elParamType = (ushort)SPEVENTLPARAMTYPE.SPET_LPARAM_IS_UNDEFINED;
-                WORD_BOUNDARY_EVENT.wParam = wParam;
-                WORD_BOUNDARY_EVENT.lParam = lParam;
-                WORD_BOUNDARY_EVENT.ullAudioStreamOffset = writtenWavLength;
+                SPEVENT WORD_BOUNDARY_EVENT = new SPEVENT
+                {
+                    eEventId = (ushort)SPEVENTENUM.SPEI_WORD_BOUNDARY,
+                    elParamType = (ushort)SPEVENTLPARAMTYPE.SPET_LPARAM_IS_UNDEFINED,
+                    wParam = wParam,
+                    lParam = lParam,
+                    ullAudioStreamOffset = writtenWavLength
+                };
                 sPEVENTList.Add(WORD_BOUNDARY_EVENT);
             }
             if (sPEVENTList.Count > 0)
@@ -449,9 +457,9 @@ namespace SAPIForVOICEVOX
             }
         }
 
-        const ushort channels = 1;
-        const uint samplesPerSec = 24000;
-        const ushort bitsPerSample = 16;
+        private const ushort Channels = 1;
+        private const uint SamplesPerSec = 24000;
+        private const ushort BitsPerSample = 16;
 
         /// <summary>
         /// 読み上げ指示の前に呼ばれるはず。
@@ -468,26 +476,28 @@ namespace SAPIForVOICEVOX
             {
                 pOutputFormatId = GetSPDFIDWaveFormatEx();
 
-                WAVEFORMATEX wAVEFORMATEX = new WAVEFORMATEX();
-                wAVEFORMATEX.wFormatTag = WAVE_FORMAT_PCM;
-                wAVEFORMATEX.nChannels = channels;
-                wAVEFORMATEX.cbSize = 0;
+                WAVEFORMATEX wAVEFORMATEX = new WAVEFORMATEX
+                {
+                    wFormatTag = WAVE_FORMAT_PCM,
+                    nChannels = Channels,
+                    cbSize = 0
+                };
                 try
                 {
                     //所望のサンプリング周波数が指定の範囲に有るときは、そのまま使う。それ以外は24k固定。
                     wAVEFORMATEX.nSamplesPerSec = pTargetWaveFormatEx.nSamplesPerSec >= 24000 && pTargetWaveFormatEx.nSamplesPerSec <= 192000
                         ? pTargetWaveFormatEx.nSamplesPerSec
-                        : samplesPerSec;
+                        : SamplesPerSec;
 
                     //所望のビット数が16か24の場合は、そのまま。それ以外は16固定。
                     wAVEFORMATEX.wBitsPerSample = pTargetWaveFormatEx.wBitsPerSample == 16 || pTargetWaveFormatEx.wBitsPerSample == 24
                         ? pTargetWaveFormatEx.wBitsPerSample
-                        : bitsPerSample;
+                        : BitsPerSample;
                 }
                 catch (Exception)
                 {
-                    wAVEFORMATEX.nSamplesPerSec = samplesPerSec;
-                    wAVEFORMATEX.wBitsPerSample = bitsPerSample;
+                    wAVEFORMATEX.nSamplesPerSec = SamplesPerSec;
+                    wAVEFORMATEX.wBitsPerSample = BitsPerSample;
                 }
                 wAVEFORMATEX.nBlockAlign = (ushort)(wAVEFORMATEX.nChannels * wAVEFORMATEX.wBitsPerSample / 8);
                 wAVEFORMATEX.nAvgBytesPerSec = wAVEFORMATEX.nSamplesPerSec * wAVEFORMATEX.nBlockAlign;
@@ -510,13 +520,13 @@ namespace SAPIForVOICEVOX
             Token = pToken;
             //初期化
             //話者番号を取得し、プロパティに設定。
-            Token.GetDWORD(Common.regSpeakerNumber, out uint value);
+            Token.GetDWORD(Common.RegSpeakerNumber, out uint value);
             unchecked //オーバーフローのチェックを行わず、そのまま代入。
             {
                 SpeakerNumber = (int)value;
             }
 
-            Token.GetDWORD(Common.regPort, out value);
+            Token.GetDWORD(Common.RegPort, out value);
             Port = (int)value;
         }
 
@@ -533,25 +543,27 @@ namespace SAPIForVOICEVOX
 
         #region レジストリ関連
 
-        const string regName1 = "VOICEVOX1";
-        const string regName2 = "VOICEVOX2";
+        private const string RegName1 = "VOICEVOX1";
+        private const string RegName2 = "VOICEVOX2";
 
         /// <summary>
         /// レジストリ登録されるときに呼ばれます。
         /// </summary>
         /// <param name="key">よくわからん。不使用。リファレンスに書いてあったから定義しただけ。</param>
         [ComRegisterFunction()]
+#pragma warning disable IDE0060 // Remove unused parameter
         public static void RegisterClass(string key)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             //四国めたん
-            using (RegistryKey registryKey = Registry.LocalMachine.CreateSubKey(Common.tokensRegKey + regName1))
+            using (RegistryKey registryKey = Registry.LocalMachine.CreateSubKey(Common.TokensRegKey + RegName1))
             {
                 registryKey.SetValue("", "VOICEVOX 四国めたん");
                 registryKey.SetValue("411", "VOICEVOX 四国めたん");
                 registryKey.SetValue("CLSID", Common.CLSID.ToString(Common.RegClsidFormatString));
-                registryKey.SetValue(Common.regSpeakerNumber, 0);
+                registryKey.SetValue(Common.RegSpeakerNumber, 0);
             }
-            using (RegistryKey registryKey = Registry.LocalMachine.CreateSubKey(Common.tokensRegKey + regName1 + @"\" + Common.regAttributes))
+            using (RegistryKey registryKey = Registry.LocalMachine.CreateSubKey(Common.TokensRegKey + RegName1 + @"\" + Common.RegAttributes))
             {
                 registryKey.SetValue("Age", "Teen");
                 registryKey.SetValue("Vendor", "Hiroshiba Kazuyuki");
@@ -561,14 +573,14 @@ namespace SAPIForVOICEVOX
             }
 
             //ずんだもん
-            using (RegistryKey registryKey = Registry.LocalMachine.CreateSubKey(Common.tokensRegKey + regName2))
+            using (RegistryKey registryKey = Registry.LocalMachine.CreateSubKey(Common.TokensRegKey + RegName2))
             {
                 registryKey.SetValue("", "VOICEVOX ずんだもん");
                 registryKey.SetValue("411", "VOICEVOX ずんだもん");
                 registryKey.SetValue("CLSID", Common.CLSID.ToString(Common.RegClsidFormatString));
-                registryKey.SetValue(Common.regSpeakerNumber, 1);
+                registryKey.SetValue(Common.RegSpeakerNumber, 1);
             }
-            using (RegistryKey registryKey = Registry.LocalMachine.CreateSubKey(Common.tokensRegKey + regName2 + @"\" + Common.regAttributes))
+            using (RegistryKey registryKey = Registry.LocalMachine.CreateSubKey(Common.TokensRegKey + RegName2 + @"\" + Common.RegAttributes))
             {
                 registryKey.SetValue("Age", "Child");
                 registryKey.SetValue("Vendor", "Hiroshiba Kazuyuki");
@@ -583,14 +595,16 @@ namespace SAPIForVOICEVOX
         /// </summary>
         /// <param name="key">よくわからん。不使用。リファレンスに書いてあったから定義しただけ。</param>
         [ComUnregisterFunction()]
+#pragma warning disable IDE0060 // Remove unused parameter
         public static void UnregisterClass(string key)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             Common.ClearStyleFromWindowsRegistry();
         }
 
         #endregion
 
-        const string wavMediaType = "audio/wav";
+        private const string WavMediaType = "audio/wav";
 
         /// <summary>
         /// VOICEVOXへ音声データ作成の指示を送ります。
@@ -619,10 +633,10 @@ namespace SAPIForVOICEVOX
             string speakerString = speakerNum.ToString();
 
             //audio_queryのためのデータ
-            var parameters = new Dictionary<string, string>()
+            Dictionary<string, string> parameters = new Dictionary<string, string>
             {
                 { "text", text },
-                { "speaker", speakerString },
+                { "speaker", speakerString }
             };
             //データのエンコード。日本語がある場合、エンコードが必要。
             string encodedParamaters = await new FormUrlEncodedContent(parameters).ReadAsStringAsync();
@@ -631,7 +645,7 @@ namespace SAPIForVOICEVOX
             {
                 //audio_queryを送る
                 string url = $"http://127.0.0.1:{Port}/";
-                using (var resultAudioQuery = await httpClient.PostAsync($"{url}audio_query?{encodedParamaters}", null))
+                using (HttpResponseMessage resultAudioQuery = await _httpClient.PostAsync($"{url}audio_query?{encodedParamaters}", null))
                 {
                     //戻り値を文字列にする
                     string resBodyStr = await resultAudioQuery.Content.ReadAsStringAsync();
@@ -648,9 +662,9 @@ namespace SAPIForVOICEVOX
                     string jsonString = JsonConvert.SerializeObject(jsonObj, Formatting.None);
 
                     //jsonコンテンツに変換
-                    var content = new StringContent(jsonString, Encoding.UTF8, @"application/json");
+                    StringContent content = new StringContent(jsonString, Encoding.UTF8, @"application/json");
                     //synthesis送信
-                    using (var resultSynthesis = await httpClient.PostAsync($"{url}synthesis?speaker={speakerString}&enable_interrogative_upspeak={enableInterrogativeUpspeak}", content))
+                    using (HttpResponseMessage resultSynthesis = await _httpClient.PostAsync($"{url}synthesis?speaker={speakerString}&enable_interrogative_upspeak={enableInterrogativeUpspeak}", content))
                     {
                         HttpContent httpContent = resultSynthesis.Content;
 
@@ -658,7 +672,7 @@ namespace SAPIForVOICEVOX
                         Stream stream = await httpContent.ReadAsStreamAsync();
                         //byte配列に変換
                         byte[] wavData = new byte[stream.Length];
-                        stream.Read(wavData, 0, (int)stream.Length);
+                        _ = stream.Read(wavData, 0, (int)stream.Length);
 
                         // データが本当にWAVEかどうか確認
                         byte[] waveHeder = Encoding.ASCII.GetBytes("RIFF    WAVE");
@@ -705,7 +719,7 @@ namespace SAPIForVOICEVOX
         /// <returns>変換結果</returns>
         private double Map(double x, double in_min, double in_max, double out_min, double out_max)
         {
-            return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+            return ((x - in_min) * (out_max - out_min) / (in_max - in_min)) + out_min;
         }
 
         /// <summary>
@@ -759,7 +773,7 @@ namespace SAPIForVOICEVOX
             // デバッグコンソールが起動中か確認して、パイプを作成
             if (Process.GetProcessesByName("SFVvConsole").Length > 0)
             {
-                using (var pipeServer = new NamedPipeServerStream(Common.PipeName))
+                using (NamedPipeServerStream pipeServer = new NamedPipeServerStream(Common.PipeName))
                 {
                     pipeServer.WaitForConnection();
                     using (StreamWriter writer = new StreamWriter(pipeServer))

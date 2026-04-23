@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace SAPIForVOICEVOX
+namespace SAPIForVOICEVOX.Exceptions
 {
     /// <summary>
     /// ボイスボックスが起動中プロセス一覧から見つからなかった場合に投げられます。
@@ -9,7 +9,7 @@ namespace SAPIForVOICEVOX
     [Serializable]
     public class VoiceVoxNotFoundException : VoiceNotificationException
     {
-        const string message = "VOICEVOXが見つかりません";
+        private const string message = "VOICEVOXが見つかりません";
 
         public VoiceVoxNotFoundException() : this(null) { }
 

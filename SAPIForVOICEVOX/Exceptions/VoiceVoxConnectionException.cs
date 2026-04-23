@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace SAPIForVOICEVOX
+namespace SAPIForVOICEVOX.Exceptions
 {
     /// <summary>
     /// ボイスボックスと通信ができない場合に投げられます。
@@ -9,7 +9,7 @@ namespace SAPIForVOICEVOX
     [Serializable]
     public class VoiceVoxConnectionException : VoiceNotificationException
     {
-        const string message = "ボイスボックスと通信ができません";
+        private const string message = "ボイスボックスと通信ができません";
 
         public VoiceVoxConnectionException() : this(null) { }
 
@@ -19,6 +19,5 @@ namespace SAPIForVOICEVOX
             ErrorVoice = new byte[stream.Length];
             stream.Read(ErrorVoice, 0, (int)stream.Length);
         }
-
     }
 }

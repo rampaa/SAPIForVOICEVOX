@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Data;
 
@@ -13,7 +12,7 @@ namespace StyleRegistrationTool.View
     /// <summary>
     /// ChangePortWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class ChangePortWindow : Window , INotifyPropertyChanged
+    public sealed partial class ChangePortWindow : Window , INotifyPropertyChanged
     {
         public ChangePortWindow(string appName, int port)
         {
@@ -62,12 +61,20 @@ namespace StyleRegistrationTool.View
             get => _nameAndPort;
             set
             {
-                if (_nameAndPort == value) return;
+                if (_nameAndPort == value)
+                {
+                    return;
+                }
+
                 _nameAndPort = value;
                 RaisePropertyChanged();
 
                 //SelectedIndexを-1にした場合、valueにnullが入るので確認
-                if (value == null) return;
+                if (value == null)
+                {
+                    return;
+                }
+
                 Port = value.Port;
                 AppName = value.Name;
                 //入力の値がプリセットに含まれていない場合、未選択にする。
@@ -87,7 +94,11 @@ namespace StyleRegistrationTool.View
             get => _port;
             set
             {
-                if (_port == value) return;
+                if (_port == value)
+                {
+                    return;
+                }
+
                 _port = value;
                 SelectedPreset = new Model.NameAndPort(AppName, value);
                 RaisePropertyChanged();
@@ -103,7 +114,11 @@ namespace StyleRegistrationTool.View
             get => _appName;
             set
             {
-                if (_appName == value) return;
+                if (_appName == value)
+                {
+                    return;
+                }
+
                 _appName = value;
                 SelectedPreset = new Model.NameAndPort(value, Port);
                 RaisePropertyChanged();
@@ -118,14 +133,14 @@ namespace StyleRegistrationTool.View
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
-            this.Close();
+            Close();
         }
     }
 
     /// <summary>
     /// boolを反転するコンバーター
     /// </summary>
-    public class BoolNegativeConverter : IValueConverter
+    public sealed class BoolNegativeConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

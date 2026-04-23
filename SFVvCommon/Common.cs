@@ -1,40 +1,41 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 
 namespace SFVvCommon
 {
-    public class Common
+    public static class Common
     {
         #region guid
 
-        public const string guidString = "7A1BB9C4-DF39-4E01-A8DC-20DC1A0C03C6";
+        public const string GuidString = "7A1BB9C4-DF39-4E01-A8DC-20DC1A0C03C6";
         /// <summary>
         /// TTSエンジンのcomで使用されるCLSID
         /// </summary>
-        public static Guid CLSID { get; } = new Guid(guidString);
+        public static Guid CLSID { get; } = new Guid(GuidString);
 
         /// <summary>
         /// レジストリ用Guid書式指定子
         /// </summary>
         /// <remarks>B書式指定子は中かっこ"{"で囲われる</remarks>
-        public static string RegClsidFormatString { get; } = "B";
+        public const string RegClsidFormatString = "B";
 
         #endregion
 
         #region レジストリ
 
-        public const string tokensRegKey = @"SOFTWARE\Microsoft\Speech\Voices\Tokens\";
-        public const string regSpeakerNumber = "SpeakerNumber";
-        public const string regClsid = "CLSID";
-        public const string regName = "Name";
-        public const string regStyleName = "StyleName";
-        public const string regPort = "Port";
-        public const string regAttributes = "Attributes";
-        public const string regAppName = "AppName";
+        public const string TokensRegKey = @"SOFTWARE\Microsoft\Speech\Voices\Tokens\";
+        public const string RegSpeakerNumber = "SpeakerNumber";
+        public const string RegClsid = "CLSID";
+        public const string RegName = "Name";
+        public const string RegStyleName = "StyleName";
+        public const string RegPort = "Port";
+        public const string RegAttributes = "Attributes";
+        public const string RegAppName = "AppName";
 
 
         /// <summary>
@@ -43,14 +44,16 @@ namespace SFVvCommon
         public static void ClearStyleFromWindowsRegistry()
         {
             //SAPIForVOICEVOXのトークンを表すキーの列挙
-            using (RegistryKey regTokensKey = Registry.LocalMachine.OpenSubKey(tokensRegKey, true))
+            using (RegistryKey regTokensKey = Registry.LocalMachine.OpenSubKey(TokensRegKey, true))
             {
+                Debug.Assert(regTokensKey != null);
                 string[] tokenNames = regTokensKey.GetSubKeyNames();
                 foreach (string tokenName in tokenNames)
                 {
                     using (RegistryKey tokenKey = regTokensKey.OpenSubKey(tokenName))
                     {
-                        string clsid = (string)tokenKey.GetValue(regClsid);
+                        Debug.Assert(tokenKey != null);
+                        string clsid = (string)tokenKey.GetValue(RegClsid);
                         if (clsid == CLSID.ToString(RegClsidFormatString))
                         {
                             regTokensKey.DeleteSubKeyTree(tokenName);
@@ -62,12 +65,12 @@ namespace SFVvCommon
 
         #endregion
 
-        const string GeneralSettingXMLFileName = "GeneralSetting.xml";
-        const string BatchParameterSettingXMLFileName = "BatchParameter.xml";
-        const string SpeakerParameterSettingXMLFileName = "SpeakerParameter.xml";
-        const string StyleRegistrationSettingXMLFileName = "StyleRegistration.xml";
+        private const string GeneralSettingXmlFileName = "GeneralSetting.xml";
+        private const string BatchParameterSettingXmlFileName = "BatchParameter.xml";
+        private const string SpeakerParameterSettingXmlFileName = "SpeakerParameter.xml";
+        private const string StyleRegistrationSettingXmlFileName = "StyleRegistration.xml";
 
-        public static readonly string PipeName = "SFVvPipe";
+        public const string PipeName = "SFVvPipe";
 
         /// <summary>
         /// スタイルの並び替えを行います。
@@ -94,7 +97,7 @@ namespace SFVvCommon
         /// 現在実行中のコードを含むアセンブリを返します。
         /// </summary>
         /// <returns></returns>
-        static public Assembly GetThisAssembly()
+        private static Assembly GetThisAssembly()
         {
             return Assembly.GetExecutingAssembly();
         }
@@ -103,7 +106,7 @@ namespace SFVvCommon
         /// 実行中のコードを格納しているアセンブリのある場所を返します。
         /// </summary>
         /// <returns></returns>
-        static public string GetThisAppDirectory()
+        private static string GetThisAppDirectory()
         {
             string appPath = GetThisAssembly().Location;
             return Path.GetDirectoryName(appPath);
@@ -113,40 +116,40 @@ namespace SFVvCommon
         /// 全般設定ファイルの名前を取得します。
         /// </summary>
         /// <returns>全般設定ファイル名</returns>
-        static public string GetGeneralSettingFileName()
+        public static string GetGeneralSettingFileName()
         {
             string directoryName = GetThisAppDirectory();
-            return Path.Combine(directoryName, GeneralSettingXMLFileName);
+            return Path.Combine(directoryName, GeneralSettingXmlFileName);
         }
 
         /// <summary>
         /// 調声設定ファイル名を取得します。
         /// </summary>
         /// <returns>調声設定ファイル名</returns>
-        static public string GetBatchParameterSettingFileName()
+        public static string GetBatchParameterSettingFileName()
         {
             string directoryName = GetThisAppDirectory();
-            return Path.Combine(directoryName, BatchParameterSettingXMLFileName);
+            return Path.Combine(directoryName, BatchParameterSettingXmlFileName);
         }
 
         /// <summary>
         /// キャラ調声設定ファイル名を取得します。
         /// </summary>
         /// <returns></returns>
-        static public string GetSpeakerParameterSettingFileName()
+        public static string GetSpeakerParameterSettingFileName()
         {
             string directoryName = GetThisAppDirectory();
-            return Path.Combine(directoryName, SpeakerParameterSettingXMLFileName);
+            return Path.Combine(directoryName, SpeakerParameterSettingXmlFileName);
         }
 
         /// <summary>
         /// スタイル登録設定ファイル名を取得します。
         /// </summary>
         /// <returns></returns>
-        static public string GetStyleRegistrationSettingFileName()
+        public static string GetStyleRegistrationSettingFileName()
         {
             string directoryName = GetThisAppDirectory();
-            return Path.Combine(directoryName, StyleRegistrationSettingXMLFileName);
+            return Path.Combine(directoryName, StyleRegistrationSettingXmlFileName);
         }
     }
 }

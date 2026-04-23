@@ -1,19 +1,20 @@
-﻿using Microsoft.Win32;
-using SFVvCommon;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Microsoft.Win32;
+using Setting.Model;
+using SFVvCommon;
 
-namespace Setting
+namespace Setting.View
 {
     /// <summary>
     /// MainWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class MainWindow : Window
+    public sealed partial class MainWindow : Window
     {
         #region 最大化ボタン無効化
 
@@ -65,7 +66,7 @@ namespace Setting
         /// <summary>
         /// メインのビューモデル
         /// </summary>
-        ViewModel MainViewModel { get; set; }
+        private ViewModel.ViewModel MainViewModel { get; set; }
 
         #endregion
 
@@ -78,10 +79,10 @@ namespace Setting
 #else
             string bitStr = "32bit版";
 #endif
-            this.Title += bitStr;
+            Title += bitStr;
 
-            MainViewModel = new ViewModel(this);
-            this.DataContext = MainViewModel;
+            MainViewModel = new ViewModel.ViewModel(this);
+            DataContext = MainViewModel;
             OkButton.Click += MainViewModel.OkButton_Click;
             ApplyButton.Click += MainViewModel.ApplyButton_Click;
             resetButton.Click += MainViewModel.ResetButton_Click;
@@ -99,20 +100,20 @@ namespace Setting
         {
             List<VoicevoxStyle> styles = new List<VoicevoxStyle>();
 
-            using (RegistryKey regTokensKey = Registry.LocalMachine.OpenSubKey(Common.tokensRegKey))
+            using (RegistryKey regTokensKey = Registry.LocalMachine.OpenSubKey(Common.TokensRegKey))
             {
                 string[] tokenNames = regTokensKey.GetSubKeyNames();
                 foreach (string tokenName in tokenNames)
                 {
                     using (RegistryKey tokenKey = regTokensKey.OpenSubKey(tokenName))
                     {
-                        string clsid = (string)tokenKey.GetValue(Common.regClsid);
+                        string clsid = (string)tokenKey.GetValue(Common.RegClsid);
                         if (clsid != Common.CLSID.ToString(Common.RegClsidFormatString))
                         {
                             continue;
                         }
 
-                        string name = (string)tokenKey.GetValue(Common.regName);
+                        string name = (string)tokenKey.GetValue(Common.RegName);
                         if (name == null)
                         {
                             AddTabDefault();
@@ -120,9 +121,9 @@ namespace Setting
                         }
                         else
                         {
-                            string styleName = (string)tokenKey.GetValue(Common.regStyleName);
-                            int id = (int)tokenKey.GetValue(Common.regSpeakerNumber, 0);
-                            int port = (int)tokenKey.GetValue(Common.regPort, 50021);
+                            string styleName = (string)tokenKey.GetValue(Common.RegStyleName);
+                            int id = (int)tokenKey.GetValue(Common.RegSpeakerNumber, 0);
+                            int port = (int)tokenKey.GetValue(Common.RegPort, 50021);
                             styles.Add(new VoicevoxStyle("VOICEVOX", name, styleName, id, port));
                         }
                     }
@@ -131,19 +132,19 @@ namespace Setting
 
             styles = Common.SortStyle(styles).OfType<VoicevoxStyle>().ToList();
 
-            foreach (var style in styles)
+            foreach (VoicevoxStyle style in styles)
             {
                 IEnumerable<TabItem> tabItems = mainTab.Items.OfType<TabItem>().Where(x => x.Header.ToString() == style.Name);
                 //スタイル名のタブ
                 TabControl tabControl;
                 if (tabItems.Count() == 0)
                 {
-                    Binding binding = new Binding("IsChecked");
-                    binding.ElementName = nameof(parCharacterRadioButton);
-                    binding.Converter = new BooleanToVisibilityConverter();
-                    TabItem tabItem = new TabItem();
-                    tabItem.Header = style.Name;
-                    tabItem.SetBinding(TabItem.VisibilityProperty, binding);
+                    Binding binding = new Binding("IsChecked")
+                    {
+                        ElementName = nameof(parCharacterRadioButton), Converter = new BooleanToVisibilityConverter()
+                    };
+                    TabItem tabItem = new TabItem { Header = style.Name };
+                    tabItem.SetBinding(VisibilityProperty, binding);
 
                     mainTab.Items.Add(tabItem);
 
@@ -159,18 +160,16 @@ namespace Setting
                 int index = MainViewModel.SpeakerParameter.FindIndex(x => x.ID == style.ID && x.Port == style.Port);
                 if (index < 0)
                 {
-                    SynthesisParameter parameter = new SynthesisParameter() { ID = style.ID, Port = style.Port };
+                    SynthesisParameter parameter = new SynthesisParameter { ID = style.ID, Port = style.Port };
                     parameter.PropertyChanged += MainViewModel.ViewModel_PropertyChanged;
                     MainViewModel.SpeakerParameter.Add(parameter);
                     index = MainViewModel.SpeakerParameter.Count - 1;
                 }
 
                 VoicevoxParameterSlider parameterSlider = new VoicevoxParameterSlider();
-                parameterSlider.SetBinding(VoicevoxParameterSlider.DataContextProperty, nameof(Setting.ViewModel.SpeakerParameter) + $"[{index}]");
+                parameterSlider.SetBinding(DataContextProperty, nameof(ViewModel.ViewModel.SpeakerParameter) + $"[{index}]");
 
-                TabItem styleTabItem = new TabItem();
-                styleTabItem.Header = style.StyleName;
-                styleTabItem.Content = parameterSlider;
+                TabItem styleTabItem = new TabItem { Header = style.StyleName, Content = parameterSlider };
 
                 tabControl.Items.Add(styleTabItem);
             }
@@ -183,21 +182,21 @@ namespace Setting
             int index = MainViewModel.SpeakerParameter.FindIndex(x => x.ID == id && x.Port == defaultPort);
             if (index < 0)
             {
-                SynthesisParameter parameter = new SynthesisParameter() { ID = id };
+                SynthesisParameter parameter = new SynthesisParameter { ID = id };
                 parameter.PropertyChanged += MainViewModel.ViewModel_PropertyChanged;
                 MainViewModel.SpeakerParameter.Add(parameter);
                 index = MainViewModel.SpeakerParameter.Count - 1;
             }
 
             VoicevoxParameterSlider parameterSlider = new VoicevoxParameterSlider();
-            parameterSlider.SetBinding(VoicevoxParameterSlider.DataContextProperty, nameof(Setting.ViewModel.SpeakerParameter) + $"[{index}]");
+            parameterSlider.SetBinding(DataContextProperty, nameof(ViewModel.ViewModel.SpeakerParameter) + $"[{index}]");
 
-            Binding binding = new Binding("IsChecked");
-            binding.ElementName = nameof(parCharacterRadioButton);
-            binding.Converter = new BooleanToVisibilityConverter();
-            TabItem tabItem = new TabItem();
-            tabItem.Header = "四国めたん";
-            tabItem.SetBinding(TabItem.VisibilityProperty, binding);
+            Binding binding = new Binding("IsChecked")
+            {
+                ElementName = nameof(parCharacterRadioButton), Converter = new BooleanToVisibilityConverter()
+            };
+            TabItem tabItem = new TabItem { Header = "四国めたん" };
+            tabItem.SetBinding(VisibilityProperty, binding);
             tabItem.Content = parameterSlider;
 
             mainTab.Items.Add(tabItem);
@@ -206,18 +205,17 @@ namespace Setting
             index = MainViewModel.SpeakerParameter.FindIndex(x => x.ID == id && x.Port == defaultPort);
             if (index < 0)
             {
-                SynthesisParameter parameter = new SynthesisParameter() { ID = id };
+                SynthesisParameter parameter = new SynthesisParameter { ID = id };
                 parameter.PropertyChanged += MainViewModel.ViewModel_PropertyChanged;
                 MainViewModel.SpeakerParameter.Add(parameter);
                 index = MainViewModel.SpeakerParameter.Count - 1;
             }
 
             parameterSlider = new VoicevoxParameterSlider();
-            parameterSlider.SetBinding(VoicevoxParameterSlider.DataContextProperty, nameof(Setting.ViewModel.SpeakerParameter) + $"[{index}]");
+            parameterSlider.SetBinding(DataContextProperty, nameof(ViewModel.ViewModel.SpeakerParameter) + $"[{index}]");
 
-            tabItem = new TabItem();
-            tabItem.Header = "ずんだもん";
-            tabItem.SetBinding(TabItem.VisibilityProperty, binding);
+            tabItem = new TabItem { Header = "ずんだもん" };
+            tabItem.SetBinding(VisibilityProperty, binding);
             tabItem.Content = parameterSlider;
 
             mainTab.Items.Add(tabItem);

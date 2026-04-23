@@ -8,7 +8,7 @@ namespace SFVvCommon
     /// </summary>
     public class StyleBase
     {
-        public StyleBase()
+        protected StyleBase()
         {
             AppName = "VOICEVOX";
             Name = "";
@@ -17,7 +17,7 @@ namespace SFVvCommon
             Port = 0;
         }
 
-        public StyleBase(string appName, string name, string styleName, int iD, int port)
+        protected StyleBase(string appName, string name, string styleName, int iD, int port)
         {
             AppName = appName ?? throw new ArgumentNullException(nameof(appName));
             Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -64,11 +64,11 @@ namespace SFVvCommon
         public override int GetHashCode()
         {
             int hashCode = 830617096;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(AppName);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(StyleName);
-            hashCode = hashCode * -1521134295 + ID.GetHashCode();
-            hashCode = hashCode * -1521134295 + Port.GetHashCode();
+            hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(AppName);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(Name);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(StyleName);
+            hashCode = (hashCode * -1521134295) + ID.GetHashCode();
+            hashCode = (hashCode * -1521134295) + Port.GetHashCode();
             return hashCode;
         }
 

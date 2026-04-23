@@ -1,25 +1,25 @@
-﻿using RomajiToHiraganaLibrary;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using RomajiToHiraganaLibrary;
 
-namespace SAPIForVOICEVOX
+namespace SAPIForVOICEVOX.EnglishToKana
 {
     /// <summary>
     /// 英単語を含む文字列を英単語の読みと対応するカナに変換する関数を提供します。
     /// </summary>
-    public class EnglishKanaDictionary : Dictionary<string, string>
+    internal sealed class EnglishKanaDictionary : Dictionary<string, string>
     {
         /// <summary>
         /// 区切り文字列
         /// </summary>
-        const string delimiterString = "  ";
+        private const string DelimiterString = "  ";
 
         /// <summary>
         /// 区切り文字の配列
         /// </summary>
-        readonly string[] delimiterStringArr = { delimiterString };
+        private readonly string[] _delimiterStringArr = { DelimiterString };
 
         /// <summary>
         /// 英語カナ辞書を初期化します。
@@ -29,10 +29,10 @@ namespace SAPIForVOICEVOX
             //改行で分割し、行ごとのデータにする。
             string[] newLineString = { "\r\n" };
             string[] lines = Properties.Resources.eng2kanaDict.Split(newLineString, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var line in lines)
+            foreach (string line in lines)
             {
                 //英語とカナを分割
-                string[] engKana = line.Split(delimiterStringArr, StringSplitOptions.RemoveEmptyEntries);
+                string[] engKana = line.Split(_delimiterStringArr, StringSplitOptions.RemoveEmptyEntries);
                 if (engKana.Length < 2)
                 {
                     continue;
@@ -40,7 +40,7 @@ namespace SAPIForVOICEVOX
                 //内部辞書に追加
                 string eng = engKana[0];
                 string kana = engKana[1];
-                this.Add(eng, kana);
+                Add(eng, kana);
             }
         }
 
@@ -49,17 +49,7 @@ namespace SAPIForVOICEVOX
         /// </summary>
         /// <param name="key">英単語</param>
         /// <returns>カナ</returns>
-        public new string this[string key]
-        {
-            get
-            {
-                return base[key];
-            }
-            private set
-            {
-                base[key] = value;
-            }
-        }
+        private new string this[string key] => base[key];
 
         /// <summary>
         /// 指定の文字列に含まれている英単語を対応する読みのカナへ置換した文字列を返します。
@@ -75,10 +65,10 @@ namespace SAPIForVOICEVOX
             IEnumerable<string> englishWords = matchCollection.Select(match => match.Value.ToLowerInvariant()).OrderByDescending(x => x.Length);
 
             string returnString = sourceString;
-            foreach (var english in englishWords)
+            foreach (string english in englishWords)
             {
                 string kana;
-                if (this.ContainsKey(english))
+                if (ContainsKey(english))
                 {
                     kana = this[english];
                 }
@@ -104,7 +94,7 @@ namespace SAPIForVOICEVOX
         /// <summary>
         /// ２つの単語を結合した英単語の対応する読みのカナを返します。
         /// </summary>
-        /// <param name="Word">英単語</param>
+        /// <param name="word">英単語</param>
         /// <returns></returns>
         private string TwoWordEngToKana(string word)
         {
@@ -119,11 +109,11 @@ namespace SAPIForVOICEVOX
                 string eng1 = word.Substring(0, i + 1);
                 string eng2 = word.Substring(i + 1);
                 //対応するカナが無い場合、継続。
-                if (!this.ContainsKey(eng1))
+                if (!ContainsKey(eng1))
                 {
                     continue;
                 }
-                if (!this.ContainsKey(eng2))
+                if (!ContainsKey(eng2))
                 {
                     continue;
                 }

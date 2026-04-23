@@ -6,9 +6,9 @@ namespace SFVvCommon
     /// <summary>
     /// SAPI用のスタイル。レジストリ登録に必要なものを保持します。
     /// </summary>
-    public class SapiStyle : StyleBase
+    public sealed class SapiStyle : StyleBase
     {
-        public SapiStyle() : base()
+        public SapiStyle()
         {
             CLSID = Common.CLSID;
         }
@@ -16,9 +16,11 @@ namespace SFVvCommon
         /// <summary>
         /// SAPIスタイルを初期化します。
         /// </summary>
+        /// <param name="appName"></param>
         /// <param name="name">話者名</param>
         /// <param name="styleName">スタイル名</param>
         /// <param name="iD">ID</param>
+        /// <param name="port"></param>
         /// <param name="clsid">SAPIエンジンのクラスID</param>
         public SapiStyle(string appName, string name, string styleName, int iD, int port, Guid clsid) : base(appName, name, styleName, iD, port)
         {
@@ -60,8 +62,8 @@ namespace SFVvCommon
         public override int GetHashCode()
         {
             int hashCode = 2093058940;
-            hashCode = hashCode * -1521134295 + base.GetHashCode();
-            hashCode = hashCode * -1521134295 + CLSID.GetHashCode();
+            hashCode = (hashCode * -1521134295) + base.GetHashCode();
+            hashCode = (hashCode * -1521134295) + CLSID.GetHashCode();
             return hashCode;
         }
 

@@ -1,14 +1,17 @@
-﻿<UserControl x:Class="Setting.VoicevoxParameterSlider"
+﻿<UserControl x:Class="Setting.View.VoicevoxParameterSlider"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Setting" d:DataContext="{d:DesignInstance Type=local:SynthesisParameter}"
+             xmlns:local="clr-namespace:Setting"
+             xmlns:converter="clr-namespace:Setting.Converter"
+             xmlns:model="clr-namespace:Setting.Model"
+             d:DataContext="{d:DesignInstance Type=model:SynthesisParameter}"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="500">
     <UserControl.Resources>
-        <local:DoubleStringConverter x:Key="DoubleConverter"/>
-        <local:ParameterValueModeToBool x:Key="ValueModeToBool"/>
+        <converter:DoubleStringConverter x:Key="DoubleConverter"/>
+        <converter:ParameterValueModeToBool x:Key="ValueModeToBool"/>
     </UserControl.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel>

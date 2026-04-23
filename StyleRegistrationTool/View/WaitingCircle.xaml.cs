@@ -10,7 +10,7 @@ namespace StyleRegistrationTool.View
     /// <summary>
     /// WaitingCircle.xaml の相互作用ロジック
     /// </summary>
-    public partial class WaitingCircle : UserControl
+    public sealed partial class WaitingCircle : UserControl
     {
         //https://araramistudio.jimdo.com/2016/11/24/wpf%E3%81%A7waitingcircle%E3%82%B3%E3%83%B3%E3%83%88%E3%83%AD%E3%83%BC%E3%83%AB%E3%82%92%E4%BD%9C%E3%82%8B/
         //から引用
@@ -41,27 +41,28 @@ namespace StyleRegistrationTool.View
             double degS = deg * 0.2;
             for (int i = 0; i < cnt; ++i)
             {
-                var si1 = Math.Sin((270.0 - (double)i * deg) / 180.0 * Math.PI);
-                var co1 = Math.Cos((270.0 - (double)i * deg) / 180.0 * Math.PI);
-                var si2 = Math.Sin((270.0 - (double)(i + 1) * deg + degS) / 180.0 * Math.PI);
-                var co2 = Math.Cos((270.0 - (double)(i + 1) * deg + degS) / 180.0 * Math.PI);
-                var x1 = r * co1 + cx;
-                var y1 = r * si1 + cy;
-                var x2 = r * co2 + cx;
-                var y2 = r * si2 + cy;
+                double si1 = Math.Sin((270.0 - ((double)i * deg)) / 180.0 * Math.PI);
+                double co1 = Math.Cos((270.0 - ((double)i * deg)) / 180.0 * Math.PI);
+                double si2 = Math.Sin((270.0 - ((double)(i + 1) * deg) + degS) / 180.0 * Math.PI);
+                double co2 = Math.Cos((270.0 - ((double)(i + 1) * deg) + degS) / 180.0 * Math.PI);
+                double x1 = (r * co1) + cx;
+                double y1 = (r * si1) + cy;
+                double x2 = (r * co2) + cx;
+                double y2 = (r * si2) + cy;
 
-                var path = new Path();
-                path.Data = Geometry.Parse(string.Format("M {0},{1} A {2},{2} 0 0 0 {3},{4}", x1, y1, r, x2, y2));
-                path.Stroke = new SolidColorBrush(Color.FromArgb((byte)(255 - (i * 256 / cnt)), CircleColor.R, CircleColor.G, CircleColor.B));
-                path.StrokeThickness = 10.0;
+                Path path = new Path
+                {
+                    Data = Geometry.Parse(string.Format("M {0},{1} A {2},{2} 0 0 0 {3},{4}", x1, y1, r, x2, y2)),
+                    Stroke = new SolidColorBrush(Color.FromArgb((byte)(255 - (i * 256 / cnt)), CircleColor.R, CircleColor.G, CircleColor.B)),
+                    StrokeThickness = 10.0
+                };
                 MainCanvas.Children.Add(path);
             }
 
-            var kf = new DoubleAnimationUsingKeyFrames();
-            kf.RepeatBehavior = RepeatBehavior.Forever;
+            DoubleAnimationUsingKeyFrames kf = new DoubleAnimationUsingKeyFrames { RepeatBehavior = RepeatBehavior.Forever };
             for (int i = 0; i < cnt; ++i)
             {
-                kf.KeyFrames.Add(new DiscreteDoubleKeyFrame()
+                kf.KeyFrames.Add(new DiscreteDoubleKeyFrame
                 {
                     KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(i * 80)),
                     Value = i * deg
@@ -72,14 +73,21 @@ namespace StyleRegistrationTool.View
 
         public void OnCircleColorPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
-            if (null == MainCanvas) return;
-            if (null == MainCanvas.Children) return;
-
-            foreach (var child in MainCanvas.Children)
+            if (null == MainCanvas)
             {
-                var shp = child as Shape;
-                var sb = shp.Stroke as SolidColorBrush;
-                var a = sb.Color.A;
+                return;
+            }
+
+            if (null == MainCanvas.Children)
+            {
+                return;
+            }
+
+            foreach (object child in MainCanvas.Children)
+            {
+                Shape shp = child as Shape;
+                SolidColorBrush sb = shp.Stroke as SolidColorBrush;
+                byte a = sb.Color.A;
                 shp.Stroke = new SolidColorBrush(Color.FromArgb(a, CircleColor.R, CircleColor.G, CircleColor.B));
             }
         }

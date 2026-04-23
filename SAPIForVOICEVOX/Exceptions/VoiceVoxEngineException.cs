@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace SAPIForVOICEVOX
+namespace SAPIForVOICEVOX.Exceptions
 {
     /// <summary>
     /// VOICEVOXのエンジンに関するエラーを表します。
@@ -9,7 +9,7 @@ namespace SAPIForVOICEVOX
     [Serializable]
     public class VoiceVoxEngineException : VoiceNotificationException
     {
-        const string message = "エンジンエラーです";
+        private const string message = "エンジンエラーです";
 
         public VoiceVoxEngineException() : this(null) { }
 

@@ -5,13 +5,15 @@ using System.IO.Pipes;
 
 namespace SFVvConsole
 {
-    class Program
+    // ReSharper disable once ClassNeverInstantiated.Global
+    internal class Program
     {
-        static void Main(string[] args)
+        // ReSharper disable once FunctionNeverReturns
+        private static void Main()
         {
             while (true)
             {
-                using (var pipeClient = new NamedPipeClientStream(Common.PipeName))
+                using (NamedPipeClientStream pipeClient = new NamedPipeClientStream(Common.PipeName))
                 {
                     pipeClient.Connect();
                     using (StreamReader reader = new StreamReader(pipeClient))

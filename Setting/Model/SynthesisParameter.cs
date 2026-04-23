@@ -2,12 +2,12 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Setting
+namespace Setting.Model
 {
     /// <summary>
     /// VOICEVOXに必要なパラメータを定義します。
     /// </summary>
-    public class SynthesisParameter : INotifyPropertyChanged
+    public sealed class SynthesisParameter : INotifyPropertyChanged
     {
         #region INotifyPropertyChangedの実装
         public event PropertyChangedEventHandler PropertyChanged;
@@ -33,13 +33,13 @@ namespace Setting
         public override int GetHashCode()
         {
             int hashCode = 1557109181;
-            hashCode = hashCode * -1521134295 + ValueMode.GetHashCode();
-            hashCode = hashCode * -1521134295 + Volume.GetHashCode();
-            hashCode = hashCode * -1521134295 + Speed.GetHashCode();
-            hashCode = hashCode * -1521134295 + Pitch.GetHashCode();
-            hashCode = hashCode * -1521134295 + PrePhonemeLength.GetHashCode();
-            hashCode = hashCode * -1521134295 + PostPhonemeLength.GetHashCode();
-            hashCode = hashCode * -1521134295 + Intonation.GetHashCode();
+            hashCode = (hashCode * -1521134295) + ValueMode.GetHashCode();
+            hashCode = (hashCode * -1521134295) + Volume.GetHashCode();
+            hashCode = (hashCode * -1521134295) + Speed.GetHashCode();
+            hashCode = (hashCode * -1521134295) + Pitch.GetHashCode();
+            hashCode = (hashCode * -1521134295) + PrePhonemeLength.GetHashCode();
+            hashCode = (hashCode * -1521134295) + PostPhonemeLength.GetHashCode();
+            hashCode = (hashCode * -1521134295) + Intonation.GetHashCode();
             return hashCode;
         }
 
@@ -54,7 +54,11 @@ namespace Setting
             get => _ValueMode;
             set
             {
-                if (_ValueMode == value) return;
+                if (_ValueMode == value)
+                {
+                    return;
+                }
+
                 _ValueMode = value;
                 RaisePropertyChanged();
             }
@@ -69,7 +73,11 @@ namespace Setting
             get => _Volume;
             set
             {
-                if (_Volume == value) return;
+                if (_Volume == value)
+                {
+                    return;
+                }
+
                 _Volume = value;
                 RaisePropertyChanged();
             }
@@ -84,13 +92,17 @@ namespace Setting
             get => _Speed;
             set
             {
-                if (_Speed == value) return;
+                if (_Speed == value)
+                {
+                    return;
+                }
+
                 _Speed = value;
                 RaisePropertyChanged();
             }
         }
 
-        private double _Pitch = 0;
+        private double _Pitch;
         /// <summary>
         /// 音高を取得、設定します。
         /// </summary>
@@ -99,7 +111,11 @@ namespace Setting
             get => _Pitch;
             set
             {
-                if (_Pitch == value) return;
+                if (_Pitch == value)
+                {
+                    return;
+                }
+
                 _Pitch = value;
                 RaisePropertyChanged();
             }
@@ -114,7 +130,11 @@ namespace Setting
             get => _Intonation;
             set
             {
-                if (_Intonation == value) return;
+                if (_Intonation == value)
+                {
+                    return;
+                }
+
                 _Intonation = value;
                 RaisePropertyChanged();
             }
@@ -129,7 +149,11 @@ namespace Setting
             get => _PrePhonemeLength;
             set
             {
-                if (_PrePhonemeLength == value) return;
+                if (_PrePhonemeLength == value)
+                {
+                    return;
+                }
+
                 _PrePhonemeLength = value;
                 RaisePropertyChanged();
             }
@@ -144,7 +168,11 @@ namespace Setting
             get => _PostPhonemeLength;
             set
             {
-                if (_PostPhonemeLength == value) return;
+                if (_PostPhonemeLength == value)
+                {
+                    return;
+                }
+
                 _PostPhonemeLength = value;
                 RaisePropertyChanged();
             }
@@ -159,13 +187,17 @@ namespace Setting
             get => _Port;
             set
             {
-                if (_Port == value) return;
+                if (_Port == value)
+                {
+                    return;
+                }
+
                 _Port = value;
                 RaisePropertyChanged();
             }
         }
 
-        private int _ID = 0;
+        private int _ID;
         /// <summary>
         /// 話者IDを取得、設定します。
         /// </summary>
@@ -174,7 +206,11 @@ namespace Setting
             get => _ID;
             set
             {
-                if (_ID == value) return;
+                if (_ID == value)
+                {
+                    return;
+                }
+
                 _ID = value;
                 RaisePropertyChanged();
             }

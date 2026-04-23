@@ -1,4 +1,4 @@
-﻿namespace Setting
+﻿namespace Setting.Model
 {
     /// <summary>
     /// 調声モード

@@ -1,11 +1,9 @@
-﻿using System.Windows;
-
-namespace Setting
+﻿namespace Setting
 {
     /// <summary>
     /// App.xaml の相互作用ロジック
     /// </summary>
-    public partial class App : Application
+    internal sealed partial class App
     {
     }
 }

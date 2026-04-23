@@ -2,12 +2,12 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Setting
+namespace Setting.View
 {
     /// <summary>
     /// voicevoxPropertySlider.xaml の相互作用ロジック
     /// </summary>
-    public partial class VoicevoxParameterSlider : UserControl
+    public sealed partial class VoicevoxParameterSlider : UserControl
     {
         public VoicevoxParameterSlider()
         {

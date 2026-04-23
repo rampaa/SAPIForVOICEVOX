@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 namespace SetupCustomActions
 {
     [RunInstaller(true)]
+    // ReSharper disable once UnusedType.Global
     public class CustomActions : Installer
     {
         /// <summary>
@@ -41,18 +42,6 @@ namespace SetupCustomActions
             }
         }
 
-        public override void Commit(IDictionary savedState)
-        {
-            base.Commit(savedState);
-
-        }
-
-        public override void Rollback(IDictionary savedState)
-        {
-            base.Rollback(savedState);
-
-        }
-
         private void RegisterDLL(RegisterType type)
         {
             // RegAsm のパスを取得
@@ -62,8 +51,8 @@ namespace SetupCustomActions
             process.StartInfo.FileName = regAsmPath;
 
             //コマンドライン引数の作成
-            string installDirectory = this.Context.Parameters["dir"];
-            string targetDllName = "SAPIForVOICEVOX.dll";
+            string installDirectory = Context.Parameters["dir"];
+            const string targetDllName = "SAPIForVOICEVOX.dll";
             string dllPath = Path.Combine(installDirectory, targetDllName);
             string arguments = dllPath;
             if (type == RegisterType.UnRegister)
@@ -88,15 +77,15 @@ namespace SetupCustomActions
 
         private void ExecuteStyleRegistrationTool()
         {
-            string installDirectory = this.Context.Parameters["dir"];
-            string targetExeName = "StyleRegistrationTool.exe";
+            string installDirectory = Context.Parameters["dir"];
+            const string targetExeName = "StyleRegistrationTool.exe";
             string targetExePath = Path.Combine(installDirectory, targetExeName);
 
             Process process = new Process();
             process.StartInfo.FileName = targetExePath;
 
             //コマンドライン引数の作成
-            string arguments = "/install";
+            const string arguments = "/install";
             process.StartInfo.Arguments = arguments;
 
             // 起動
@@ -107,7 +96,7 @@ namespace SetupCustomActions
         /// レジストリ登録するか。
         /// レジストリ解除するか。
         /// </summary>
-        enum RegisterType
+        private enum RegisterType
         {
             /// <summary>
             /// 登録

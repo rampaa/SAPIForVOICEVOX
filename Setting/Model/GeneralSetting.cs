@@ -1,9 +1,9 @@
-﻿namespace Setting
+﻿namespace Setting.Model
 {
     /// <summary>
     /// 全般設定を定義します。
     /// </summary>
-    public class GeneralSetting
+    public sealed class GeneralSetting
     {
         /// <summary>
         /// 句点で分割するかどうか。
