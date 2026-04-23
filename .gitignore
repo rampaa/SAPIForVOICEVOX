@@ -365,3 +365,6 @@ FodyWeavers.xsd
 /download2.txt
 /ReleaseDownloadCount.bat
 /ShowDownloadCount.bat
+
+.idea
+.vscode
