@@ -106,7 +106,9 @@ namespace SAPIForVOICEVOX
         private const ulong SPFEI_ALL_SR_EVENTS = 0x003FFFFC00000000ul | SPFEI_FLAGCHECK;
         private const ulong SPFEI_ALL_EVENTS = 0xEFFFFFFFFFFFFFFFul;
 
+#pragma warning disable IDE1006 // Naming Styles
         private ulong SPFEI(SPEVENTENUM SPEI_ord)
+#pragma warning restore IDE1006 // Naming Styles
         {
             return (1ul << (int)SPEI_ord) | SPFEI_FLAGCHECK;
         }
@@ -177,7 +179,9 @@ namespace SAPIForVOICEVOX
             //SAPIの情報取得
             pOutputSite.GetRate(out int tempInt);
             //SAPIは0が真ん中
+#pragma warning disable IDE1006 // Naming Styles
             double SAPIspeed;
+#pragma warning restore IDE1006 // Naming Styles
             if (tempInt < 0)
             {
                 SAPIspeed = Map(tempInt, -10, 0, 0.5, 1.0);
@@ -427,6 +431,7 @@ namespace SAPIForVOICEVOX
             //SPEI_SENTENCE_BOUNDARYとWORD_BOUNDARY_EVENTにのみ対応
             if ((ulongValue & SPFEI(SPEVENTENUM.SPEI_SENTENCE_BOUNDARY)) == SPFEI(SPEVENTENUM.SPEI_SENTENCE_BOUNDARY))
             {
+#pragma warning disable IDE1006 // Naming Styles
                 SPEVENT SENTENCE_BOUNDARY_EVENT = new SPEVENT
                 {
                     eEventId = (ushort)SPEVENTENUM.SPEI_SENTENCE_BOUNDARY,
@@ -435,11 +440,13 @@ namespace SAPIForVOICEVOX
                     lParam = lParam,
                     ullAudioStreamOffset = writtenWavLength
                 };
+#pragma warning restore IDE1006 // Naming Styles
 
                 sPEVENTList.Add(SENTENCE_BOUNDARY_EVENT);
             }
             if ((ulongValue & SPFEI(SPEVENTENUM.SPEI_WORD_BOUNDARY)) == SPFEI(SPEVENTENUM.SPEI_WORD_BOUNDARY))
             {
+#pragma warning disable IDE1006 // Naming Styles
                 SPEVENT WORD_BOUNDARY_EVENT = new SPEVENT
                 {
                     eEventId = (ushort)SPEVENTENUM.SPEI_WORD_BOUNDARY,
@@ -448,6 +455,7 @@ namespace SAPIForVOICEVOX
                     lParam = lParam,
                     ullAudioStreamOffset = writtenWavLength
                 };
+#pragma warning restore IDE1006 // Naming Styles
                 sPEVENTList.Add(WORD_BOUNDARY_EVENT);
             }
             if (sPEVENTList.Count > 0)

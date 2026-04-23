@@ -191,21 +191,21 @@ namespace StyleRegistrationTool.ViewModel
             }
         }
 
-        private bool _IsMainWindowEnabled;
+        private bool _isMainWindowEnabled;
         /// <summary>
         /// メイン画面が有効かどうか
         /// </summary>
         public bool IsMainWindowEnabled
         {
-            get => _IsMainWindowEnabled;
+            get => _isMainWindowEnabled;
             set
             {
-                if (_IsMainWindowEnabled == value)
+                if (_isMainWindowEnabled == value)
                 {
                     return;
                 }
 
-                _IsMainWindowEnabled = value;
+                _isMainWindowEnabled = value;
                 RaisePropertyChanged();
             }
         }
@@ -305,7 +305,7 @@ namespace StyleRegistrationTool.ViewModel
         private async Task<bool> UpdateVoicevoxStyles(bool isAllStyleRegistration)
         {
             //VOICEVOXから話者情報取得
-            VoicevoxStyle[] voicevoxStyles = null;
+            VoicevoxStyle[] voicevoxStyles;
             while (true)
             {
                 try
@@ -749,7 +749,9 @@ namespace StyleRegistrationTool.ViewModel
         /// </summary>
         private class DelegateCommand : ICommand
         {
+#pragma warning disable CS0067
             public event EventHandler CanExecuteChanged;
+#pragma warning restore CS0067
 
             public DelegateCommand(Action executeMethod)
             {
