@@ -9,15 +9,15 @@ namespace SAPIForVOICEVOX.Exceptions
     [Serializable]
     public class VoiceVoxEngineException : VoiceNotificationException
     {
-        private const string message = "エンジンエラーです";
+        private const string VoiceVoxEngineExceptionMessage = "エンジンエラーです";
 
         public VoiceVoxEngineException() : this(null) { }
 
-        public VoiceVoxEngineException(Exception innerException) : base(message, innerException)
+        public VoiceVoxEngineException(Exception innerException) : base(VoiceVoxEngineExceptionMessage, innerException)
         {
             Stream stream = Properties.Resources.エンジンエラーです;
             ErrorVoice = new byte[stream.Length];
-            stream.Read(ErrorVoice, 0, (int)stream.Length);
+            _ = stream.Read(ErrorVoice, 0, (int)stream.Length);
         }
     }
 }

@@ -9,15 +9,15 @@ namespace SAPIForVOICEVOX.Exceptions
     [Serializable]
     public class VoiceVoxNotFoundException : VoiceNotificationException
     {
-        private const string message = "VOICEVOXが見つかりません";
+        private const string VoiceVoxNotFoundExceptionMessage = "VOICEVOXが見つかりません";
 
         public VoiceVoxNotFoundException() : this(null) { }
 
-        public VoiceVoxNotFoundException(Exception innerException) : base(message, innerException)
+        public VoiceVoxNotFoundException(Exception innerException) : base(VoiceVoxNotFoundExceptionMessage, innerException)
         {
             Stream stream = Properties.Resources.ボイスボックスが見つかりません;
             ErrorVoice = new byte[stream.Length];
-            stream.Read(ErrorVoice, 0, (int)stream.Length);
+            _ = stream.Read(ErrorVoice, 0, (int)stream.Length);
         }
     }
 }

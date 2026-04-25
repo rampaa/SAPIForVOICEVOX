@@ -256,22 +256,20 @@ namespace StyleRegistrationTool.ViewModel
                     OkCommandExecute();
                     return;
                 }
-                else
+
+                InstallerDialogResult dialogResult = ShowStartedInstallerDialog(mainWindow);
+                switch (dialogResult)
                 {
-                    InstallerDialogResult dialogResult = ShowStartedInstallerDialog(mainWindow);
-                    switch (dialogResult)
-                    {
-                        case InstallerDialogResult.SelectStyle:
-                            //何もしない
-                            break;
-                        case InstallerDialogResult.AllStyle:
-                            await AllStyleRegistration();
-                            return;
-                        case InstallerDialogResult.DefaultStyle:
-                        default:
-                            mainWindow.Close();
-                            return;
-                    }
+                    case InstallerDialogResult.SelectStyle:
+                        //何もしない
+                        break;
+                    case InstallerDialogResult.AllStyle:
+                        await AllStyleRegistration();
+                        return;
+                    case InstallerDialogResult.DefaultStyle:
+                    default:
+                        mainWindow.Close();
+                        return;
                 }
             }
             else
@@ -320,10 +318,8 @@ namespace StyleRegistrationTool.ViewModel
                     {
                         continue;
                     }
-                    else
-                    {
-                        return false;
-                    }
+
+                    return false;
                 }
             }
             if (voicevoxStyles == null)
@@ -581,10 +577,8 @@ namespace StyleRegistrationTool.ViewModel
                 Port = portWindow.Port;
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         /// <summary>
@@ -652,7 +646,7 @@ namespace StyleRegistrationTool.ViewModel
             if (!File.Exists(settingFileName))
             {
                 //無い場合はそのまま返す。
-                return new SapiStyle[0];
+                return Array.Empty<SapiStyle>();
             }
 
             XmlSerializer serializerGeneralSetting = new XmlSerializer(typeof(SapiStyle[]));
@@ -679,7 +673,7 @@ namespace StyleRegistrationTool.ViewModel
 
             using (RegistryKey regTokensKey = Registry.LocalMachine.OpenSubKey(Common.TokensRegKey, true))
             {
-                for (int i = 0; i < SapiStyles.Count(); i++)
+                for (int i = 0; i < SapiStyles.Count; i++)
                 {
                     using (RegistryKey voiceVoxRegkey = regTokensKey.CreateSubKey("VOICEVOX" + i.ToString("000")))
                     {

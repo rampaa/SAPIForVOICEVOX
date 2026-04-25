@@ -9,15 +9,15 @@ namespace SAPIForVOICEVOX.Exceptions
     [Serializable]
     public class VoiceVoxConnectionException : VoiceNotificationException
     {
-        private const string message = "ボイスボックスと通信ができません";
+        private const string VoiceVoxConnectionExceptionMessage = "ボイスボックスと通信ができません";
 
         public VoiceVoxConnectionException() : this(null) { }
 
-        public VoiceVoxConnectionException(Exception innerException) : base(message, innerException)
+        public VoiceVoxConnectionException(Exception innerException) : base(VoiceVoxConnectionExceptionMessage, innerException)
         {
             Stream stream = Properties.Resources.ボイスボックスと通信ができません;
             ErrorVoice = new byte[stream.Length];
-            stream.Read(ErrorVoice, 0, (int)stream.Length);
+            _ = stream.Read(ErrorVoice, 0, (int)stream.Length);
         }
     }
 }

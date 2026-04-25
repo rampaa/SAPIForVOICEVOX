@@ -119,13 +119,11 @@ namespace Setting.View
                             AddTabDefault();
                             return;
                         }
-                        else
-                        {
-                            string styleName = (string)tokenKey.GetValue(Common.RegStyleName);
-                            int id = (int)tokenKey.GetValue(Common.RegSpeakerNumber, 0);
-                            int port = (int)tokenKey.GetValue(Common.RegPort, 50021);
-                            styles.Add(new VoicevoxStyle("VOICEVOX", name, styleName, id, port));
-                        }
+
+                        string styleName = (string)tokenKey.GetValue(Common.RegStyleName);
+                        int id = (int)tokenKey.GetValue(Common.RegSpeakerNumber, 0);
+                        int port = (int)tokenKey.GetValue(Common.RegPort, 50021);
+                        styles.Add(new VoicevoxStyle("VOICEVOX", name, styleName, id, port));
                     }
                 }
             }
