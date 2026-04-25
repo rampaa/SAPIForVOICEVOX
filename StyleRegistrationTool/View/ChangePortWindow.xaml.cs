@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Data;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace StyleRegistrationTool.View
 {
@@ -21,14 +22,14 @@ namespace StyleRegistrationTool.View
             DataContext = this;
 
             //プリセット作成
-            PortComboBox.Items.Add(new Model.NameAndPort("VOICEVOX", 50021));
-            PortComboBox.Items.Add(new Model.NameAndPort("VOICEVOX Nemo", 50121));
-            PortComboBox.Items.Add(new Model.NameAndPort("COEIROINK", 50031));
-            PortComboBox.Items.Add(new Model.NameAndPort("LMROID", 50073));
-            PortComboBox.Items.Add(new Model.NameAndPort("SHAREVOX", 50025));
-            PortComboBox.Items.Add(new Model.NameAndPort("ITVOICE", 49540));
-            PortComboBox.Items.Add(new Model.NameAndPort("COEIROINK v2 bridge", 50132));
-            PortComboBox.Items.Add(new Model.NameAndPort("AivisSpeech", 10101));
+            _ = PortComboBox.Items.Add(new Model.NameAndPort("VOICEVOX", 50021));
+            _ = PortComboBox.Items.Add(new Model.NameAndPort("VOICEVOX Nemo", 50121));
+            _ = PortComboBox.Items.Add(new Model.NameAndPort("COEIROINK", 50031));
+            _ = PortComboBox.Items.Add(new Model.NameAndPort("LMROID", 50073));
+            _ = PortComboBox.Items.Add(new Model.NameAndPort("SHAREVOX", 50025));
+            _ = PortComboBox.Items.Add(new Model.NameAndPort("ITVOICE", 49540));
+            _ = PortComboBox.Items.Add(new Model.NameAndPort("COEIROINK v2 bridge", 50132));
+            _ = PortComboBox.Items.Add(new Model.NameAndPort("AivisSpeech", 10101));
 
 
             SelectedPreset = new Model.NameAndPort(appName, port);

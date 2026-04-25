@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 // ReSharper disable NonReadonlyMemberInGetHashCode
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 
 namespace SFVvCommon
 {

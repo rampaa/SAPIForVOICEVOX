@@ -73,14 +73,8 @@ namespace SFVvCommon
             return hashCode;
         }
 
-        public static bool operator ==(StyleBase left, StyleBase right)
-        {
-            return EqualityComparer<StyleBase>.Default.Equals(left, right);
-        }
+        public static bool operator ==(StyleBase left, StyleBase right) => EqualityComparer<StyleBase>.Default.Equals(left, right);
 
-        public static bool operator !=(StyleBase left, StyleBase right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(StyleBase left, StyleBase right) => !(left == right);
     }
 }
