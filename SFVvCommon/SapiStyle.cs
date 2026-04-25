@@ -32,6 +32,7 @@ namespace SFVvCommon
         /// </summary>
         /// <param name="voicevoxStyle">VOICEVOXスタイル</param>
         /// <param name="clsid">SAPIエンジンのクラスID</param>
+        // ReSharper disable once SuggestBaseTypeForParameterInConstructor
         public SapiStyle(VoicevoxStyle voicevoxStyle, Guid clsid) : this(voicevoxStyle.AppName, voicevoxStyle.Name, voicevoxStyle.StyleName, voicevoxStyle.ID, voicevoxStyle.Port, clsid)
         {
         }

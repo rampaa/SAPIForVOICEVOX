@@ -164,6 +164,17 @@ namespace SAPIForVOICEVOX
             _engKanaDict = new EnglishKanaDictionary();
         }
 
+        private ref struct VoiceParams
+        {
+            public double Speed { get; set; }
+            public double Volume { get; set; }
+            public double Pitch { get; set; }
+            public double Intonation { get; set; }
+            public double PrePhonemeLength { get; set; }
+            public double PostPhonemeLength { get; set; }
+            public bool EnableInterrogativeUpspeak { get; set; }
+        }
+
         /// <summary>
         /// スピークメソッド。
         /// 読み上げ指示が来ると呼ばれる。
@@ -196,23 +207,23 @@ namespace SAPIForVOICEVOX
 
             //設定アプリのデータ取得
             GetSettingData(SpeakerNumber, out GeneralSetting generalSetting, out SynthesisParameter synthesisParameter);
-            double speed;
-            double volume;
+
+            VoiceParams vParams = new VoiceParams();
             if (synthesisParameter.ValueMode == ParameterValueMode.SAPI)
             {
-                speed = SAPIspeed;
-                volume = sapiVolume;
+                vParams.Speed = SAPIspeed;
+                vParams.Volume = sapiVolume;
             }
             else
             {
-                speed = synthesisParameter.Speed;
-                volume = synthesisParameter.Volume;
+                vParams.Speed = synthesisParameter.Speed;
+                vParams.Volume = synthesisParameter.Volume;
             }
-            double pitch = synthesisParameter.Pitch;
-            double intonation = synthesisParameter.Intonation;
-            double prePhonemeLength = synthesisParameter.PrePhonemeLength;
-            double postPhonemeLength = synthesisParameter.PostPhonemeLength;
-            bool enableInterrogativeUpspeak = generalSetting.useInterrogativeAutoAdjustment ?? false;
+            vParams.Pitch = synthesisParameter.Pitch;
+            vParams.Intonation = synthesisParameter.Intonation;
+            vParams.PrePhonemeLength = synthesisParameter.PrePhonemeLength;
+            vParams.PostPhonemeLength = synthesisParameter.PostPhonemeLength;
+            vParams.EnableInterrogativeUpspeak = generalSetting.useInterrogativeAutoAdjustment ?? false;
 
             //区切り文字設定
             List<string> charSeparators = new List<string>();
@@ -228,6 +239,8 @@ namespace SAPIForVOICEVOX
             {
                 charSeparators.Add(Environment.NewLine);
             }
+
+            WaveFormat targetFormat = new WaveFormat((int)pWaveFormatEx.nSamplesPerSec, pWaveFormatEx.wBitsPerSample, pWaveFormatEx.nChannels);
 
             try
             {
@@ -254,54 +267,9 @@ namespace SAPIForVOICEVOX
 
                     foreach (string str in splitString)
                     {
-                        //アクションを確認し、アボートの場合は終了
-                        SPVESACTIONS spveActions = (SPVESACTIONS)pOutputSite.GetActions();
-                        if (spveActions.HasFlag(SPVESACTIONS.SPVES_ABORT))
+                        if (!SynthesizeAndOutput(str, pOutputSite, ref vParams, generalSetting, targetFormat, currentTextList.pTextStart, ref writtenWavLength))
                         {
                             return;
-                        }
-
-                        //SAPIイベント
-                        if (generalSetting.useSspiEvent ?? false)
-                        {
-                            AddEventToSAPI(pOutputSite, currentTextList.pTextStart, str, writtenWavLength);
-                        }
-
-                        //英単語をカナへ置換
-                        string replaceString = _engKanaDict.ReplaceEnglishToKana(str);
-
-                        //VOICEVOXへ送信
-                        //asyncメソッドにはref引数を指定できないらしいので、awaitも使用できない。awaitを使用しない実装にした。
-                        Task<byte[]> waveDataTask = SendToVoiceVox(replaceString, SpeakerNumber, speed, pitch, intonation, volume, prePhonemeLength, postPhonemeLength, enableInterrogativeUpspeak);
-                        byte[] waveData;
-                        try
-                        {
-                            waveDataTask.Wait();
-                            waveData = waveDataTask.Result;
-                        }
-                        catch (AggregateException ex) when (ex.InnerException is VoiceVoxEngineException voiceNotification)
-                        {
-                            //エンジンエラーを通知するかどうか
-                            if (generalSetting.shouldNotifyEngineError ?? false)
-                            {
-                                waveData = voiceNotification.ErrorVoice;
-                            }
-                            else
-                            {
-                                waveData = Array.Empty<byte>();
-                            }
-                        }
-
-                        //リサンプリング
-                        using (MemoryStream stream = new MemoryStream(waveData))
-                        using (WaveFileReader reader = new WaveFileReader(stream))
-                        {
-                            WaveFormat waveFormat = new WaveFormat((int)pWaveFormatEx.nSamplesPerSec, pWaveFormatEx.wBitsPerSample, pWaveFormatEx.nChannels);
-                            using (MediaFoundationResampler resampler = new MediaFoundationResampler(reader, waveFormat))
-                            {
-                                //書き込み
-                                writtenWavLength += OutputSiteWriteSafe(pOutputSite, resampler);
-                            }
                         }
                     }
 
@@ -316,18 +284,73 @@ namespace SAPIForVOICEVOX
                 }
             }
             //Task.Waitは例外をまとめてAggregateExceptionで投げる。
-            catch (AggregateException ex) when (ex.InnerException is VoiceNotificationException voiceNotification)
+            catch (AggregateException ex) when (ex.InnerException is VoiceNotificationException)
             {
-                byte[] waveData = voiceNotification.ErrorVoice;
-                using (MemoryStream stream = new MemoryStream(waveData))
-                using (WaveFileReader reader = new WaveFileReader(stream))
+                if (ex.InnerException is VoiceNotificationException voiceNotification)
                 {
-                    WaveFormat waveFormat = new WaveFormat((int)pWaveFormatEx.nSamplesPerSec, pWaveFormatEx.wBitsPerSample, pWaveFormatEx.nChannels);
-                    using (MediaFoundationResampler resampler = new MediaFoundationResampler(reader, waveFormat))
-                    {
-                        //書き込み
-                        _ = OutputSiteWriteSafe(pOutputSite, resampler);
-                    }
+                    _ = ResampleAndWrite(voiceNotification.ErrorVoice, pOutputSite, targetFormat);
+                }
+            }
+        }
+
+        private bool SynthesizeAndOutput(string str, ISpTTSEngineSite pOutputSite, ref VoiceParams p, GeneralSetting generalSetting, WaveFormat targetFormat, string pTextStart, ref ulong writtenWavLength)
+        {
+            //アクションを確認し、アボートの場合は終了
+            SPVESACTIONS spveActions = (SPVESACTIONS)pOutputSite.GetActions();
+            if (spveActions.HasFlag(SPVESACTIONS.SPVES_ABORT))
+            {
+                return false;
+            }
+
+            //SAPIイベント
+            if (generalSetting.useSspiEvent ?? false)
+            {
+                AddEventToSAPI(pOutputSite, pTextStart, str, writtenWavLength);
+            }
+
+            //英単語をカナへ置換
+            string replaceString = _engKanaDict.ReplaceEnglishToKana(str);
+
+            //VOICEVOXへ送信
+            //asyncメソッドにはref引数を指定できないらしいので、awaitも使用できない。awaitを使用しない実装にした。
+            Task<byte[]> waveDataTask = SendToVoiceVox(replaceString, SpeakerNumber, p.Speed, p.Pitch, p.Intonation, p.Volume, p.PrePhonemeLength, p.PostPhonemeLength, p.EnableInterrogativeUpspeak);
+            byte[] waveData;
+            try
+            {
+                waveDataTask.Wait();
+                waveData = waveDataTask.Result;
+            }
+            catch (AggregateException ex) when (ex.InnerException is VoiceVoxEngineException voiceNotification)
+            {
+                //エンジンエラーを通知するかどうか
+                if (generalSetting.shouldNotifyEngineError ?? false)
+                {
+                    waveData = voiceNotification.ErrorVoice;
+                }
+                else
+                {
+                    waveData = Array.Empty<byte>();
+                }
+            }
+
+            if (waveData != null && waveData.Length > 0)
+            {
+                writtenWavLength += ResampleAndWrite(waveData, pOutputSite, targetFormat);
+            }
+
+            return true;
+        }
+
+        private ulong ResampleAndWrite(byte[] waveData, ISpTTSEngineSite pOutputSite, WaveFormat targetFormat)
+        {
+            //リサンプリング
+            using (MemoryStream stream = new MemoryStream(waveData))
+            using (WaveFileReader reader = new WaveFileReader(stream))
+            {
+                using (MediaFoundationResampler resampler = new MediaFoundationResampler(reader, targetFormat))
+                {
+                    //書き込み
+                    return OutputSiteWriteSafe(pOutputSite, resampler);
                 }
             }
         }
