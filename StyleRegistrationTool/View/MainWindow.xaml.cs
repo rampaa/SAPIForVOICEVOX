@@ -13,9 +13,9 @@ namespace StyleRegistrationTool.View
     /// <summary>
     /// MainWindow.xaml の相互作用ロジック
     /// </summary>
-    internal sealed partial class MainWindow
+    public sealed partial class MainWindow : Window
     {
-        private readonly MainViewModel _viewModel;
+        private MainViewModel viewModel;
 
         public MainWindow()
         {
@@ -24,13 +24,13 @@ namespace StyleRegistrationTool.View
 #if x64
             string bitStr = "64bit版";
 #else
-            const string bitStr = "32bit版";
+            string bitStr = "32bit版";
 #endif
             Title += bitStr;
 
-            _viewModel = new MainViewModel(this);
-            DataContext = _viewModel;
-            Loaded += _viewModel.MainWindow_Loaded;
+            viewModel = new MainViewModel(this);
+            DataContext = viewModel;
+            Loaded += viewModel.MainWindow_Loaded;
         }
 
         /// <summary>
@@ -47,12 +47,12 @@ namespace StyleRegistrationTool.View
 
         private void VoicevoxStyleList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _viewModel.VoicevoxStyleSelectedItems = VoicevoxStyleList.SelectedItems.Cast<VoicevoxStyle>();
+            viewModel.VoicevoxStyle_SelectedItems = VoicevoxStyleList.SelectedItems.Cast<VoicevoxStyle>();
         }
 
         private void SapiStyleList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _viewModel.SapiStyleSelectedItems = SapiStyleList.SelectedItems.Cast<SapiStyle>();
+            viewModel.SapiStyle_SelectedItems = SapiStyleList.SelectedItems.Cast<SapiStyle>();
         }
 
         private void GridViewColumnHeader_Click(object sender, RoutedEventArgs e)
@@ -61,25 +61,29 @@ namespace StyleRegistrationTool.View
             string columnTag = columnHeader.Tag.ToString();
             string columnHeaderString = columnHeader.Content.ToString();
 
-            bool isAscending = !columnHeaderString.Contains("▼");
+            bool isAscending = true;
+            if (columnHeaderString.Contains("▼"))
+            {
+                isAscending = false;
+            }
 
             IEnumerable<SapiStyle> sortedList;
             switch (columnTag)
             {
                 case nameof(SapiStyle.AppName):
-                    sortedList = isAscending ? _viewModel.SapiStyles.OrderBy(x => x.AppName) : _viewModel.SapiStyles.OrderByDescending(x => x.AppName);
+                    sortedList = isAscending ? viewModel.SapiStyles.OrderBy(x => x.AppName) : viewModel.SapiStyles.OrderByDescending(x => x.AppName);
                     break;
                 case nameof(SapiStyle.Name):
-                    sortedList = isAscending ? _viewModel.SapiStyles.OrderBy(x => x.Name, new StyleComparer()) : _viewModel.SapiStyles.OrderByDescending(x => x.Name, new StyleComparer());
+                    sortedList = isAscending ? viewModel.SapiStyles.OrderBy(x => x.Name, new StyleComparer()) : viewModel.SapiStyles.OrderByDescending(x => x.Name, new StyleComparer());
                     break;
                 case nameof(SapiStyle.StyleName):
-                    sortedList = isAscending ? _viewModel.SapiStyles.OrderBy(x => x.StyleName) : _viewModel.SapiStyles.OrderByDescending(x => x.StyleName);
+                    sortedList = isAscending ? viewModel.SapiStyles.OrderBy(x => x.StyleName) : viewModel.SapiStyles.OrderByDescending(x => x.StyleName);
                     break;
                 case nameof(SapiStyle.ID):
-                    sortedList = isAscending ? _viewModel.SapiStyles.OrderBy(x => x.ID) : _viewModel.SapiStyles.OrderByDescending(x => x.ID);
+                    sortedList = isAscending ? viewModel.SapiStyles.OrderBy(x => x.ID) : viewModel.SapiStyles.OrderByDescending(x => x.ID);
                     break;
                 case nameof(SapiStyle.Port):
-                    sortedList = isAscending ? _viewModel.SapiStyles.OrderBy(x => x.Port) : _viewModel.SapiStyles.OrderByDescending(x => x.Port);
+                    sortedList = isAscending ? viewModel.SapiStyles.OrderBy(x => x.Port) : viewModel.SapiStyles.OrderByDescending(x => x.Port);
                     break;
                 default:
                     return;
@@ -117,7 +121,7 @@ namespace StyleRegistrationTool.View
                 item.Content = headerString;
             }
 
-            _viewModel.SapiStyles = new ObservableCollection<SapiStyle>(sortedList);
+            viewModel.SapiStyles = new ObservableCollection<SapiStyle>(sortedList);
         }
     }
 }
