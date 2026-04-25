@@ -299,7 +299,7 @@ namespace Setting.ViewModel
         */
 
 #if x64
-        const string MutexName = "SAPIForVOICEVOX64bit";
+        private const string MutexName = "SAPIForVOICEVOX64bit";
 #else
         private const string MutexName = "SAPIForVOICEVOX32bit";
 #endif

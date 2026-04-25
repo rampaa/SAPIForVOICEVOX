@@ -54,77 +54,77 @@ namespace StyleRegistrationTool.ViewModel
         /// <summary>
         /// メインウィンドウを取得、設定します。
         /// </summary>
-        public MainWindow MainWindow { get; set; }
+        private MainWindow MainWindow { get; }
 
         /// <summary>
         /// okボタンのコマンド
         /// </summary>
-        public ICommand OkCommand { get; set; }
+        public ICommand OkCommand { get; }
 
         /// <summary>
         /// キャンセルボタンのコマンド
         /// </summary>
-        public ICommand CancelCommand { get; set; }
+        public ICommand CancelCommand { get; }
 
         /// <summary>
         /// ポート変更ボタンのコマンド
         /// </summary>
-        public ICommand ChangePortCommand { get; set; }
+        public ICommand ChangePortCommand { get; }
 
         /// <summary>
         /// 追加コマンド
         /// </summary>
-        public ICommand AddCommand { get; set; }
+        public ICommand AddCommand { get; }
 
         /// <summary>
         /// 削除コマンド
         /// </summary>
-        public ICommand RemoveCommand { get; set; }
+        public ICommand RemoveCommand { get; }
 
         /// <summary>
         /// 全て追加コマンド
         /// </summary>
-        public ICommand AllAddCommand { get; set; }
+        public ICommand AllAddCommand { get; }
 
         /// <summary>
         /// 全て削除コマンド
         /// </summary>
-        public ICommand AllRemoveCommand { get; set; }
+        public ICommand AllRemoveCommand { get; }
 
         /// <summary>
         /// 並び替え上ボタンコマンド
         /// </summary>
-        public ICommand UpButtonCommand { get; set; }
+        public ICommand UpButtonCommand { get; }
 
         /// <summary>
         /// 並び替え下ボタンコマンド
         /// </summary>
-        public ICommand DownButtonCommand { get; set; }
+        public ICommand DownButtonCommand { get; }
 
         /// <summary>
         /// VOICEVOX側リストの選択されてるアイテム一覧
         /// </summary>
-        internal IEnumerable<VoicevoxStyle> VoicevoxStyle_SelectedItems { get; set; } = Enumerable.Empty<VoicevoxStyle>();
+        internal IEnumerable<VoicevoxStyle> VoicevoxStyleSelectedItems { get; set; } = Enumerable.Empty<VoicevoxStyle>();
 
         /// <summary>
         /// SAPI側リストの選択されているアイテム一覧
         /// </summary>
-        internal IEnumerable<SapiStyle> SapiStyle_SelectedItems { get; set; } = Enumerable.Empty<SapiStyle>();
+        internal IEnumerable<SapiStyle> SapiStyleSelectedItems { get; set; } = Enumerable.Empty<SapiStyle>();
 
         /// <summary>
         /// ソート済みSAPI側リストの選択されているアイテム一覧
         /// </summary>
-        internal IEnumerable<SapiStyle> SapiStyle_SortedSelectedItems => SapiStyle_SelectedItems.OrderBy(x => SapiStyles.IndexOf(x)).ToArray();
+        private IEnumerable<SapiStyle> SapiStyleSortedSelectedItems => SapiStyleSelectedItems.OrderBy(x => SapiStyles.IndexOf(x)).ToArray();
 
         /// <summary>
         /// ソート済みSAPI側リストの選択されているアイテム一覧
         /// </summary>
-        internal IEnumerable<SapiStyle> SapiStyle_SortedSelectedItemsReverse => SapiStyle_SelectedItems.OrderByDescending(x => SapiStyles.IndexOf(x)).ToArray();
+        private IEnumerable<SapiStyle> SapiStyleSortedSelectedItemsReverse => SapiStyleSelectedItems.OrderByDescending(x => SapiStyles.IndexOf(x)).ToArray();
 
         /// <summary>
         /// ポート番号
         /// </summary>
-        internal int Port { get; set; } = 50021;
+        private int Port { get; set; } = 50021;
 
         #region NotifyProperty
 
@@ -135,7 +135,7 @@ namespace StyleRegistrationTool.ViewModel
         public string AppName
         {
             get => _appName;
-            set
+            private set
             {
                 if (_appName == value)
                 {
@@ -160,7 +160,7 @@ namespace StyleRegistrationTool.ViewModel
         public ObservableCollection<VoicevoxStyle> VoicevoxStyles
         {
             get => _voicevoxStyles;
-            set
+            private set
             {
                 if (_voicevoxStyles == value)
                 {
@@ -266,6 +266,7 @@ namespace StyleRegistrationTool.ViewModel
                     case InstallerDialogResult.AllStyle:
                         await AllStyleRegistration();
                         return;
+                    // ReSharper disable once RedundantEnumCaseLabelForDefaultSection
                     case InstallerDialogResult.DefaultStyle:
                     default:
                         mainWindow.Close();
@@ -352,6 +353,7 @@ namespace StyleRegistrationTool.ViewModel
         /// <summary>
         /// ポート変更ボタン
         /// </summary>
+        // ReSharper disable once AsyncVoidMethod
         private async void ChangePortCommandExecute()
         {
             int prevPort = Port;
@@ -377,7 +379,7 @@ namespace StyleRegistrationTool.ViewModel
         /// </summary>
         private void AddCommandExecute()
         {
-            foreach (VoicevoxStyle item in VoicevoxStyle_SelectedItems)
+            foreach (VoicevoxStyle item in VoicevoxStyleSelectedItems)
             {
                 SapiStyle sapiStyle = new SapiStyle(item, Common.CLSID);
                 if (!SapiStyles.Contains(sapiStyle))
@@ -392,7 +394,7 @@ namespace StyleRegistrationTool.ViewModel
         /// </summary>
         private void RemoveCommandExecute()
         {
-            List<SapiStyle> sapiStyles = new List<SapiStyle>(SapiStyle_SelectedItems);
+            List<SapiStyle> sapiStyles = new List<SapiStyle>(SapiStyleSelectedItems);
             foreach (SapiStyle item in sapiStyles)
             {
                 _ = SapiStyles.Remove(item);
@@ -427,7 +429,7 @@ namespace StyleRegistrationTool.ViewModel
         /// </summary>
         private void UpButtonCommandExecute()
         {
-            foreach (SapiStyle item in SapiStyle_SortedSelectedItems)
+            foreach (SapiStyle item in SapiStyleSortedSelectedItems)
             {
                 int index = SapiStyles.IndexOf(item);
                 if (index == 0)
@@ -443,7 +445,7 @@ namespace StyleRegistrationTool.ViewModel
         /// </summary>
         private void DownButtonCommandExecute()
         {
-            foreach (SapiStyle item in SapiStyle_SortedSelectedItemsReverse)
+            foreach (SapiStyle item in SapiStyleSortedSelectedItemsReverse)
             {
                 int index = SapiStyles.IndexOf(item);
                 if (index == SapiStyles.Count - 1)
@@ -473,7 +475,7 @@ namespace StyleRegistrationTool.ViewModel
             TaskDialog dialog = new TaskDialog
             {
                 OwnerWindowHandle = window.Handle,
-                Caption = $"話者とスタイルの登録",
+                Caption = "話者とスタイルの登録",
                 InstructionText = "話者とスタイルの登録を行います。",
                 Text = "後で登録することもできます。\n後で登録する場合、スタートの全てのプログラムから起動できます。"
             };
@@ -638,7 +640,7 @@ namespace StyleRegistrationTool.ViewModel
         /// <summary>
         /// スタイル情報をローカルXMLファイルから読み込みます。
         /// </summary>
-        private SapiStyle[] LoadStylesToLocalFile()
+        private static SapiStyle[] LoadStylesToLocalFile()
         {
             string settingFileName = Common.GetStyleRegistrationSettingFileName();
 
@@ -703,7 +705,7 @@ namespace StyleRegistrationTool.ViewModel
         /// レジストリに登録されているSAPIの話者情報を取得します。
         /// </summary>
         /// <returns></returns>
-        private SapiStyle[] GetSapiStyles()
+        private static SapiStyle[] GetSapiStyles()
         {
             List<SapiStyle> sapiStyles = new List<SapiStyle>();
 
@@ -741,7 +743,7 @@ namespace StyleRegistrationTool.ViewModel
         /// <summary>
         /// プリズムのコードを参考に、デリゲートコマンドを作成。
         /// </summary>
-        private class DelegateCommand : ICommand
+        private sealed class DelegateCommand : ICommand
         {
 #pragma warning disable CS0067
             public event EventHandler CanExecuteChanged;

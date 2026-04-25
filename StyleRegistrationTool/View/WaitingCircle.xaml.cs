@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -55,13 +55,13 @@ namespace StyleRegistrationTool.View
                     Stroke = new SolidColorBrush(Color.FromArgb((byte)(255 - (i * 256 / cnt)), CircleColor.R, CircleColor.G, CircleColor.B)),
                     StrokeThickness = 10.0
                 };
-                MainCanvas.Children.Add(path);
+                _ = MainCanvas.Children.Add(path);
             }
 
             DoubleAnimationUsingKeyFrames kf = new DoubleAnimationUsingKeyFrames { RepeatBehavior = RepeatBehavior.Forever };
             for (int i = 0; i < cnt; ++i)
             {
-                kf.KeyFrames.Add(new DiscreteDoubleKeyFrame
+                _ = kf.KeyFrames.Add(new DiscreteDoubleKeyFrame
                 {
                     KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(i * 80)),
                     Value = i * deg

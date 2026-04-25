@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 // ReSharper disable CompareOfFloatsByEqualityOperator
+// ReSharper disable MemberCanBeInternal
 
 namespace Setting.Model
 {
@@ -194,7 +195,7 @@ namespace Setting.Model
         public int Port
         {
             get => _port;
-            internal set
+            set
             {
                 if (_port == value)
                 {
@@ -213,7 +214,7 @@ namespace Setting.Model
         public int ID
         {
             get => _id;
-            internal set
+            set
             {
                 if (_id == value)
                 {

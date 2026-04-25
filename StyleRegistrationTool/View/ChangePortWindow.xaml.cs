@@ -21,14 +21,14 @@ namespace StyleRegistrationTool.View
             DataContext = this;
 
             //プリセット作成
-            portComboBox.Items.Add(new Model.NameAndPort("VOICEVOX", 50021));
-            portComboBox.Items.Add(new Model.NameAndPort("VOICEVOX Nemo", 50121));
-            portComboBox.Items.Add(new Model.NameAndPort("COEIROINK", 50031));
-            portComboBox.Items.Add(new Model.NameAndPort("LMROID", 50073));
-            portComboBox.Items.Add(new Model.NameAndPort("SHAREVOX", 50025));
-            portComboBox.Items.Add(new Model.NameAndPort("ITVOICE", 49540));
-            portComboBox.Items.Add(new Model.NameAndPort("COEIROINK v2 bridge", 50132));
-            portComboBox.Items.Add(new Model.NameAndPort("AivisSpeech", 10101));
+            PortComboBox.Items.Add(new Model.NameAndPort("VOICEVOX", 50021));
+            PortComboBox.Items.Add(new Model.NameAndPort("VOICEVOX Nemo", 50121));
+            PortComboBox.Items.Add(new Model.NameAndPort("COEIROINK", 50031));
+            PortComboBox.Items.Add(new Model.NameAndPort("LMROID", 50073));
+            PortComboBox.Items.Add(new Model.NameAndPort("SHAREVOX", 50025));
+            PortComboBox.Items.Add(new Model.NameAndPort("ITVOICE", 49540));
+            PortComboBox.Items.Add(new Model.NameAndPort("COEIROINK v2 bridge", 50132));
+            PortComboBox.Items.Add(new Model.NameAndPort("AivisSpeech", 10101));
 
 
             SelectedPreset = new Model.NameAndPort(appName, port);
@@ -78,9 +78,9 @@ namespace StyleRegistrationTool.View
                 Port = value.Port;
                 AppName = value.Name;
                 //入力の値がプリセットに含まれていない場合、未選択にする。
-                if (!portComboBox.Items.Contains(SelectedPreset))
+                if (!PortComboBox.Items.Contains(SelectedPreset))
                 {
-                    portComboBox.SelectedIndex = -1;
+                    PortComboBox.SelectedIndex = -1;
                 }
             }
         }
@@ -92,7 +92,7 @@ namespace StyleRegistrationTool.View
         public int Port
         {
             get => _port;
-            set
+            private set
             {
                 if (_port == value)
                 {
@@ -112,7 +112,7 @@ namespace StyleRegistrationTool.View
         public string AppName
         {
             get => _appName;
-            set
+            private set
             {
                 if (_appName == value)
                 {

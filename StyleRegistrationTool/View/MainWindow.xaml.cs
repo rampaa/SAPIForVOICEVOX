@@ -47,12 +47,12 @@ namespace StyleRegistrationTool.View
 
         private void VoicevoxStyleList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _viewModel.VoicevoxStyle_SelectedItems = VoicevoxStyleList.SelectedItems.Cast<VoicevoxStyle>();
+            _viewModel.VoicevoxStyleSelectedItems = VoicevoxStyleList.SelectedItems.Cast<VoicevoxStyle>();
         }
 
         private void SapiStyleList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _viewModel.SapiStyle_SelectedItems = SapiStyleList.SelectedItems.Cast<SapiStyle>();
+            _viewModel.SapiStyleSelectedItems = SapiStyleList.SelectedItems.Cast<SapiStyle>();
         }
 
         private void GridViewColumnHeader_Click(object sender, RoutedEventArgs e)

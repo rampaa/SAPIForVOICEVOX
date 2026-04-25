@@ -1,6 +1,4 @@
-﻿using System.Windows;
-
-namespace StyleRegistrationTool
+﻿namespace StyleRegistrationTool
 {
     /// <summary>
     /// App.xaml の相互作用ロジック

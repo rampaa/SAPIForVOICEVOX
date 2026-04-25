@@ -14,7 +14,7 @@
         <StackPanel>
             <DockPanel>
                 <TextBlock DockPanel.Dock="Left" Text="プリセット" Margin="3" Width="45" VerticalAlignment="Center"/>
-                <ComboBox x:Name="portComboBox" SelectedItem="{Binding SelectedPreset}" DisplayMemberPath="Name" Width="150" Margin="3" IsTextSearchEnabled="False"/>
+                <ComboBox x:Name="PortComboBox" SelectedItem="{Binding SelectedPreset}" DisplayMemberPath="Name" Width="150" Margin="3" IsTextSearchEnabled="False"/>
             </DockPanel>
             <DockPanel>
                 <TextBlock DockPanel.Dock="Left" Text="アプリ名" Margin="3" Width="45"/>
