@@ -595,14 +595,27 @@ namespace StyleRegistrationTool.ViewModel
                 //戻り値を文字列にする
                 string resBodyStr = await resultSpeakers.Content.ReadAsStringAsync();
                 JArray jsonObj = JArray.Parse(resBodyStr);
-                foreach (JToken speaker in jsonObj)
+                foreach (JToken speakerJToken in jsonObj)
                 {
-                    string name = speaker["name"].ToString();
-                    foreach (JToken style in speaker["styles"])
+                    JToken speakerNameJToken = speakerJToken["name"];
+                    if (speakerNameJToken != null)
                     {
-                        string styleName = style["name"].ToString();
-                        int id = style.Value<int>("id");
-                        voicevoxStyles.Add(new VoicevoxStyle(AppName, name, styleName, id, Port));
+                        string name = speakerNameJToken.ToString();
+
+                        JToken stylesJToken = speakerJToken["styles"];
+                        if (stylesJToken != null)
+                        {
+                            foreach (JToken styleJToken in stylesJToken)
+                            {
+                                JToken styleNameJToken = styleJToken["name"];
+                                if (styleNameJToken != null)
+                                {
+                                    string styleName = styleNameJToken.ToString();
+                                    int id = styleJToken.Value<int>("id");
+                                    voicevoxStyles.Add(new VoicevoxStyle(AppName, name, styleName, id, Port));
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -677,24 +690,33 @@ namespace StyleRegistrationTool.ViewModel
             {
                 for (int i = 0; i < SapiStyles.Count; i++)
                 {
-                    using (RegistryKey voiceVoxRegkey = regTokensKey.CreateSubKey("VOICEVOX" + i.ToString("000")))
+                    if (regTokensKey != null)
                     {
-                        voiceVoxRegkey.SetValue("", SapiStyles[i].SpaiName);
-                        voiceVoxRegkey.SetValue("411", SapiStyles[i].SpaiName);
-                        voiceVoxRegkey.SetValue(Common.RegClsid, SapiStyles[i].CLSID.ToString(Common.RegClsidFormatString));
-                        voiceVoxRegkey.SetValue(Common.RegSpeakerNumber, SapiStyles[i].ID);
-                        voiceVoxRegkey.SetValue(Common.RegName, SapiStyles[i].Name);
-                        voiceVoxRegkey.SetValue(Common.RegStyleName, SapiStyles[i].StyleName);
-                        voiceVoxRegkey.SetValue(Common.RegPort, SapiStyles[i].Port);
-                        voiceVoxRegkey.SetValue(Common.RegAppName, SapiStyles[i].AppName);
-
-                        using (RegistryKey attributesRegkey = voiceVoxRegkey.CreateSubKey(Common.RegAttributes))
+                        using (RegistryKey voiceVoxRegkey = regTokensKey.CreateSubKey("VOICEVOX" + i.ToString("000")))
                         {
-                            attributesRegkey.SetValue("Age", "Teen");
-                            attributesRegkey.SetValue("Vendor", "Hiroshiba Kazuyuki");
-                            attributesRegkey.SetValue("Language", "411");
-                            attributesRegkey.SetValue("Gender", "Female");
-                            attributesRegkey.SetValue("Name", SapiStyles[i].SpaiName);
+                            if (voiceVoxRegkey != null)
+                            {
+                                voiceVoxRegkey.SetValue("", SapiStyles[i].SpaiName);
+                                voiceVoxRegkey.SetValue("411", SapiStyles[i].SpaiName);
+                                voiceVoxRegkey.SetValue(Common.RegClsid, SapiStyles[i].CLSID.ToString(Common.RegClsidFormatString));
+                                voiceVoxRegkey.SetValue(Common.RegSpeakerNumber, SapiStyles[i].ID);
+                                voiceVoxRegkey.SetValue(Common.RegName, SapiStyles[i].Name);
+                                voiceVoxRegkey.SetValue(Common.RegStyleName, SapiStyles[i].StyleName);
+                                voiceVoxRegkey.SetValue(Common.RegPort, SapiStyles[i].Port);
+                                voiceVoxRegkey.SetValue(Common.RegAppName, SapiStyles[i].AppName);
+
+                                using (RegistryKey attributesRegkey = voiceVoxRegkey.CreateSubKey(Common.RegAttributes))
+                                {
+                                    if (attributesRegkey != null)
+                                    {
+                                        attributesRegkey.SetValue("Age", "Teen");
+                                        attributesRegkey.SetValue("Vendor", "Hiroshiba Kazuyuki");
+                                        attributesRegkey.SetValue("Language", "411");
+                                        attributesRegkey.SetValue("Gender", "Female");
+                                        attributesRegkey.SetValue("Name", SapiStyles[i].SpaiName);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -711,22 +733,28 @@ namespace StyleRegistrationTool.ViewModel
 
             using (RegistryKey regTokensKey = Registry.LocalMachine.OpenSubKey(Common.TokensRegKey, true))
             {
-                string[] tokenNames = regTokensKey.GetSubKeyNames();
-                foreach (string tokenName in tokenNames)
+                if (regTokensKey != null)
                 {
-                    using (RegistryKey tokenKey = regTokensKey.OpenSubKey(tokenName))
+                    string[] tokenNames = regTokensKey.GetSubKeyNames();
+                    foreach (string tokenName in tokenNames)
                     {
-                        string clsid = (string)tokenKey.GetValue(Common.RegClsid);
-                        string name = (string)tokenKey.GetValue(Common.RegName);
-                        if (clsid == Common.CLSID.ToString(Common.RegClsidFormatString) &&
-                            name != null)
+                        using (RegistryKey tokenKey = regTokensKey.OpenSubKey(tokenName))
                         {
-                            string styleName = (string)tokenKey.GetValue(Common.RegStyleName);
-                            int id = (int)tokenKey.GetValue(Common.RegSpeakerNumber, 0);
-                            int port = (int)tokenKey.GetValue(Common.RegPort, 50021);
-                            string appName = (string)tokenKey.GetValue(Common.RegAppName, "VOICEVOX");
-                            SapiStyle sapiStyle = new SapiStyle(appName, name, styleName, id, port, new Guid(clsid));
-                            sapiStyles.Add(sapiStyle);
+                            if (tokenKey != null)
+                            {
+                                string clsid = (string)tokenKey.GetValue(Common.RegClsid);
+                                string name = (string)tokenKey.GetValue(Common.RegName);
+                                if (clsid == Common.CLSID.ToString(Common.RegClsidFormatString) &&
+                                    name != null)
+                                {
+                                    string styleName = (string)tokenKey.GetValue(Common.RegStyleName);
+                                    int id = (int)tokenKey.GetValue(Common.RegSpeakerNumber, 0);
+                                    int port = (int)tokenKey.GetValue(Common.RegPort, 50021);
+                                    string appName = (string)tokenKey.GetValue(Common.RegAppName, "VOICEVOX");
+                                    SapiStyle sapiStyle = new SapiStyle(appName, name, styleName, id, port, new Guid(clsid));
+                                    sapiStyles.Add(sapiStyle);
+                                }
+                            }
                         }
                     }
                 }
