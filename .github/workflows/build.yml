@@ -57,7 +57,7 @@ jobs:
         run: dotnet script .\tools\change_version.csx -- .\ ${{github.ref_name}}
 
       - name: Add devenv to PATH
-        uses: step-security/gha-setup-vsdevenv@6
+        uses: step-security/gha-setup-vsdevenv@v6
 
       - name: Restore NuGet packages
         working-directory: ${{env.GITHUB_WORKSPACE}}
