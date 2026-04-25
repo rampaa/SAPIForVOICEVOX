@@ -3,13 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Setting.View"
         mc:Ignorable="d"
-        Title="バージョン情報" SizeToContent="WidthAndHeight" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
+        Title="バージョン情報" SizeToContent="WidthAndHeight" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
+        x:ClassModifier="internal">
     <Grid Margin="5">
         <StackPanel>
             <TextBlock Text="SAPI For VOICEVOX"/>
-            <TextBlock Text="Version 0.0.0" x:Name="versionString"/>
+            <TextBlock Text="Version 0.0.0" x:Name="VersionString"/>
             <TextBlock Text="Copyright (c) 2021 shigobu"/>
             <TextBlock Text="MIT License"/>
             <TextBlock>

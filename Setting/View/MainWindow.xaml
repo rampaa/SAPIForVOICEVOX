@@ -8,7 +8,8 @@
         xmlns:viewModel="clr-namespace:Setting.ViewModel"
         d:DataContext="{d:DesignInstance Type=viewModel:ViewModel}"
         mc:Ignorable="d"
-        Title="SAPIForVOICEVOX 設定 " Height="430" Width="350" MinHeight="300" MinWidth="350" WindowStartupLocation="CenterScreen" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Icon="/Setting;component/icon/settings.ico" SourceInitialized="Window_SourceInitialized">
+        Title="SAPIForVOICEVOX 設定 " Height="430" Width="350" MinHeight="300" MinWidth="350" WindowStartupLocation="CenterScreen" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Icon="/Setting;component/icon/settings.ico" SourceInitialized="Window_SourceInitialized"
+        x:ClassModifier="internal">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolVisibilityConverter"/>
         <converter:SynthesisSettingModeToBool x:Key="SettinModeConverter"/>
@@ -20,7 +21,7 @@
                 <Button x:Name="CancelButton" Width="60" Margin="3" IsCancel="True" Click="CancelButton_Click">キャンセル</Button>
                 <Button x:Name="ApplyButton" Width="60" Margin="3">適用</Button>
             </StackPanel>
-            <TabControl x:Name="mainTab">
+            <TabControl x:Name="MainTab">
                 <TabItem Header="全般">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel>
@@ -33,8 +34,8 @@
                             </GroupBox>
                             <GroupBox DockPanel.Dock="Top" Header="調声">
                                 <StackPanel>
-                                    <RadioButton x:Name="allRadioButton" Margin="3" Content="一括で設定する" IsChecked="{Binding SynthesisSettingMode, ConverterParameter=Batch, Converter={StaticResource SettinModeConverter}}"/>
-                                    <RadioButton x:Name="parCharacterRadioButton" Margin="3" Content="キャラクター毎に設定する"  IsChecked="{Binding SynthesisSettingMode, ConverterParameter=EachCharacter, Converter={StaticResource SettinModeConverter}}"/>
+                                    <RadioButton x:Name="AllRadioButton" Margin="3" Content="一括で設定する" IsChecked="{Binding SynthesisSettingMode, ConverterParameter=Batch, Converter={StaticResource SettinModeConverter}}"/>
+                                    <RadioButton x:Name="ParCharacterRadioButton" Margin="3" Content="キャラクター毎に設定する"  IsChecked="{Binding SynthesisSettingMode, ConverterParameter=EachCharacter, Converter={StaticResource SettinModeConverter}}"/>
                                 </StackPanel>
                             </GroupBox>
                             <GroupBox DockPanel.Dock="Top" Header="高度な設定">
@@ -49,13 +50,13 @@
                                 </StackPanel>
                             </GroupBox>
                             <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
-                                <Button x:Name="resetButton" Margin="3" Width="100" HorizontalAlignment="Left" Content="初期状態へ戻す"/>
-                                <Button x:Name="versionInfoButton" Margin="3" Width="100" Content="バージョン情報"/>
+                                <Button x:Name="ResetButton" Margin="3" Width="100" HorizontalAlignment="Left" Content="初期状態へ戻す"/>
+                                <Button x:Name="VersionInfoButton" Margin="3" Width="100" Content="バージョン情報"/>
                             </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
-                <TabItem Header="調声" Visibility="{Binding IsChecked, ElementName=allRadioButton ,Converter={StaticResource BoolVisibilityConverter}}">
+                <TabItem Header="調声" Visibility="{Binding IsChecked, ElementName=AllRadioButton ,Converter={StaticResource BoolVisibilityConverter}}">
                     <view:VoicevoxParameterSlider DataContext="{Binding BatchParameter}"/>
                 </TabItem>
             </TabControl>

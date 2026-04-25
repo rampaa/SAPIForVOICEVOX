@@ -7,7 +7,7 @@ namespace Setting.View
     /// <summary>
     /// VersionInfoWindow.xaml の相互作用ロジック
     /// </summary>
-    public sealed partial class VersionInfoWindow : Window
+    internal sealed partial class VersionInfoWindow
     {
         public VersionInfoWindow()
         {
@@ -15,7 +15,7 @@ namespace Setting.View
 
             System.Reflection.Assembly asm = System.Reflection.Assembly.GetExecutingAssembly();
             System.Version ver = asm.GetName().Version;
-            versionString.Text = $"Version {ver}";
+            VersionString.Text = $"Version {ver}";
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

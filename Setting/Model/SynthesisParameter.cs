@@ -1,33 +1,39 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+// ReSharper disable CompareOfFloatsByEqualityOperator
 
 namespace Setting.Model
 {
     /// <summary>
     /// VOICEVOXに必要なパラメータを定義します。
     /// </summary>
-    public sealed class SynthesisParameter : INotifyPropertyChanged
+    public sealed class SynthesisParameter : INotifyPropertyChanged, IEquatable<SynthesisParameter>
     {
         #region INotifyPropertyChangedの実装
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        private void RaisePropertyChanged([CallerMemberName] string propertyName = null)
           => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         #endregion
 
         #region Equals
+
+        public bool Equals(SynthesisParameter other)
+        {
+            return other != null && ValueMode == other.ValueMode &&
+                Volume == other.Volume &&
+                Speed == other.Speed &&
+                Pitch == other.Pitch &&
+                PrePhonemeLength == other.PrePhonemeLength &&
+                PostPhonemeLength == other.PostPhonemeLength &&
+                Intonation == other.Intonation;
+        }
+
         public override bool Equals(object obj)
         {
-            return obj is SynthesisParameter parameter &&
-                   ValueMode == parameter.ValueMode &&
-                   Volume == parameter.Volume &&
-                   Speed == parameter.Speed &&
-                   Pitch == parameter.Pitch &&
-                   PrePhonemeLength == parameter.PrePhonemeLength &&
-                   PostPhonemeLength == parameter.PostPhonemeLength &&
-                   Intonation == parameter.Intonation;
+            return obj is SynthesisParameter parameter && Equals(parameter);
         }
 
         public override int GetHashCode()
@@ -43,175 +49,178 @@ namespace Setting.Model
             return hashCode;
         }
 
+        // ReSharper disable once ArrangeRedundantParentheses
+        public static bool operator ==(SynthesisParameter left, SynthesisParameter right) => left?.Equals(right) ?? (right is null);
+        public static bool operator !=(SynthesisParameter left, SynthesisParameter right) => !(left == right);
         #endregion
 
-        private ParameterValueMode _ValueMode = ParameterValueMode.SAPI;
+        private ParameterValueMode _valueMode = ParameterValueMode.SAPI;
         /// <summary>
         /// SAPIの値を使用するか、設定アプリの値を使用するかを取得、設定します。
         /// </summary>
         public ParameterValueMode ValueMode
         {
-            get => _ValueMode;
+            get => _valueMode;
             set
             {
-                if (_ValueMode == value)
+                if (_valueMode == value)
                 {
                     return;
                 }
 
-                _ValueMode = value;
+                _valueMode = value;
                 RaisePropertyChanged();
             }
         }
 
-        private double _Volume = 1;
+        private double _volume = 1;
         /// <summary>
         /// 音量を取得、設定します。
         /// </summary>
         public double Volume
         {
-            get => _Volume;
+            get => _volume;
             set
             {
-                if (_Volume == value)
+                if (_volume == value)
                 {
                     return;
                 }
 
-                _Volume = value;
+                _volume = value;
                 RaisePropertyChanged();
             }
         }
 
-        private double _Speed = 1;
+        private double _speed = 1;
         /// <summary>
         /// 話速を取得、設定します。
         /// </summary>
         public double Speed
         {
-            get => _Speed;
+            get => _speed;
             set
             {
-                if (_Speed == value)
+                if (_speed == value)
                 {
                     return;
                 }
 
-                _Speed = value;
+                _speed = value;
                 RaisePropertyChanged();
             }
         }
 
-        private double _Pitch;
+        private double _pitch;
         /// <summary>
         /// 音高を取得、設定します。
         /// </summary>
         public double Pitch
         {
-            get => _Pitch;
+            get => _pitch;
             set
             {
-                if (_Pitch == value)
+                if (_pitch == value)
                 {
                     return;
                 }
 
-                _Pitch = value;
+                _pitch = value;
                 RaisePropertyChanged();
             }
         }
 
-        private double _Intonation = 1;
+        private double _intonation = 1;
         /// <summary>
         /// 抑揚を取得、設定します。
         /// </summary>
         public double Intonation
         {
-            get => _Intonation;
+            get => _intonation;
             set
             {
-                if (_Intonation == value)
+                if (_intonation == value)
                 {
                     return;
                 }
 
-                _Intonation = value;
+                _intonation = value;
                 RaisePropertyChanged();
             }
         }
 
-        private double _PrePhonemeLength = 0.1;
+        private double _prePhonemeLength = 0.1;
         /// <summary>
         /// 開始無音を取得、設定します。
         /// </summary>
         public double PrePhonemeLength
         {
-            get => _PrePhonemeLength;
+            get => _prePhonemeLength;
             set
             {
-                if (_PrePhonemeLength == value)
+                if (_prePhonemeLength == value)
                 {
                     return;
                 }
 
-                _PrePhonemeLength = value;
+                _prePhonemeLength = value;
                 RaisePropertyChanged();
             }
         }
 
-        private double _PostPhonemeLength = 0.1;
+        private double _postPhonemeLength = 0.1;
         /// <summary>
         /// 終了無音を取得、設定します。
         /// </summary>
         public double PostPhonemeLength
         {
-            get => _PostPhonemeLength;
+            get => _postPhonemeLength;
             set
             {
-                if (_PostPhonemeLength == value)
+                if (_postPhonemeLength == value)
                 {
                     return;
                 }
 
-                _PostPhonemeLength = value;
+                _postPhonemeLength = value;
                 RaisePropertyChanged();
             }
         }
 
-        private int _Port = 50021;
+        private int _port = 50021;
         /// <summary>
         /// ポートを取得、設定します。
         /// </summary>
         public int Port
         {
-            get => _Port;
-            set
+            get => _port;
+            internal set
             {
-                if (_Port == value)
+                if (_port == value)
                 {
                     return;
                 }
 
-                _Port = value;
+                _port = value;
                 RaisePropertyChanged();
             }
         }
 
-        private int _ID;
+        private int _id;
         /// <summary>
         /// 話者IDを取得、設定します。
         /// </summary>
         public int ID
         {
-            get => _ID;
-            set
+            get => _id;
+            internal set
             {
-                if (_ID == value)
+                if (_id == value)
                 {
                     return;
                 }
 
-                _ID = value;
+                _id = value;
                 RaisePropertyChanged();
             }
         }
@@ -219,6 +228,6 @@ namespace Setting.Model
         /// <summary>
         /// 設定ファイルのバージョンを所得、設定します。
         /// </summary>
-        public string Version { get; set; } = new Version(1, 0, 0).ToString();
+        internal string Version { get; set; } = new Version(1, 0, 0).ToString();
     }
 }

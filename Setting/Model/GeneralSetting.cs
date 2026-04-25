@@ -1,10 +1,17 @@
-﻿namespace Setting.Model
+using System.Diagnostics.CodeAnalysis;
+
+namespace Setting.Model
 {
     /// <summary>
     /// 全般設定を定義します。
     /// </summary>
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+#pragma warning restore IDE0079 // Remove unnecessary suppression
     public sealed class GeneralSetting
     {
+#pragma warning disable IDE1006 // Naming Styles
+
         /// <summary>
         /// 句点で分割するかどうか。
         /// </summary>
@@ -39,6 +46,6 @@
         /// 疑問文を自動調声するかどうか
         /// </summary>
         public bool? useInterrogativeAutoAdjustment = false;
-
+#pragma warning restore IDE1006 // Naming Styles
     }
 }

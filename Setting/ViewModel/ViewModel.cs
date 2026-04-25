@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -37,7 +38,7 @@ namespace Setting.ViewModel
 
         #region プロパティとか
 
-        private MainWindow Owner { get; set; }
+        private MainWindow Owner { get; }
 
         /// <summary>
         /// Model
@@ -124,9 +125,9 @@ namespace Setting.ViewModel
         public SynthesisParameter BatchParameter
         {
             get => _batchParameter;
-            set
+            private set
             {
-                if (_batchParameter == value)
+                if (_batchParameter.Equals(value))
                 {
                     return;
                 }
@@ -222,7 +223,9 @@ namespace Setting.ViewModel
         internal void OkButton_Click(object sender, RoutedEventArgs e)
         {
             SaveData();
-            Window.GetWindow((Button)sender).Close();
+            Window window = Window.GetWindow((Button)sender);
+            Debug.Assert(window != null);
+            window.Close();
         }
 
         /// <summary>
@@ -241,7 +244,9 @@ namespace Setting.ViewModel
         /// </summary>
         internal void ResetButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult result = MessageBox.Show(Window.GetWindow((Button)sender), "各キャラクターの調声パラメータも含めて全て初期値にリセットします。" + Environment.NewLine + "よろしいですか？", "確認", MessageBoxButton.YesNo, MessageBoxImage.Information);
+            Window window = Window.GetWindow((Button)sender);
+            Debug.Assert(window != null);
+            MessageBoxResult result = MessageBox.Show(window, "各キャラクターの調声パラメータも含めて全て初期値にリセットします。" + Environment.NewLine + "よろしいですか？", "確認", MessageBoxButton.YesNo, MessageBoxImage.Information);
             if (result == MessageBoxResult.No)
             {
                 return;
@@ -273,7 +278,7 @@ namespace Setting.ViewModel
         internal void VersionInfoButton_Click(object sender, RoutedEventArgs e)
         {
             VersionInfoWindow versionInfoWindow = new VersionInfoWindow { Owner = Owner };
-            versionInfoWindow.ShowDialog();
+            _ = versionInfoWindow.ShowDialog();
         }
 
         /// <summary>
@@ -289,9 +294,9 @@ namespace Setting.ViewModel
 
         #region 定数
 
-/*
-        private const int CharacterCount = 100;
-*/
+        /*
+                private const int CharacterCount = 100;
+        */
 
 #if x64
         const string MutexName = "SAPIForVOICEVOX64bit";
@@ -371,7 +376,7 @@ namespace Setting.ViewModel
             try
             {
                 //ミューテックス取得
-                mutex.WaitOne();
+                _ = mutex.WaitOne();
 
                 XmlSerializer serializerGeneralSetting = new XmlSerializer(typeof(GeneralSetting));
                 XmlReaderSettings xmlSettings = new XmlReaderSettings
@@ -418,7 +423,7 @@ namespace Setting.ViewModel
             try
             {
                 //ミューテックス取得
-                mutex.WaitOne();
+                _ = mutex.WaitOne();
 
                 XmlSerializer serializerSynthesisParameter = new XmlSerializer(typeof(SynthesisParameter));
                 XmlReaderSettings xmlSettings = new XmlReaderSettings
@@ -466,7 +471,7 @@ namespace Setting.ViewModel
             try
             {
                 //同じファイルを同時に操作しないために、ミューテックスを使用
-                mutex.WaitOne();
+                _ = mutex.WaitOne();
 
                 XmlSerializer serializerSynthesisParameter = new XmlSerializer(typeof(List<SynthesisParameter>));
                 XmlReaderSettings xmlSettings = new XmlReaderSettings
@@ -480,7 +485,7 @@ namespace Setting.ViewModel
                     result = (List<SynthesisParameter>)serializerSynthesisParameter.Deserialize(xmlReader);
                 }
                 //データがバージョン１の場合
-                if (result.Count != 0 && new Version(result.First().Version).Major  == 1)
+                if (result.Count != 0 && new Version(result.First().Version).Major == 1)
                 {
                     result = new List<SynthesisParameter>();
                 }

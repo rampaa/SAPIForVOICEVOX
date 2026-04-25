@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -14,7 +16,8 @@ namespace Setting.View
     /// <summary>
     /// MainWindow.xaml の相互作用ロジック
     /// </summary>
-    public sealed partial class MainWindow : Window
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    internal sealed partial class MainWindow
     {
         #region 最大化ボタン無効化
 
@@ -56,7 +59,7 @@ namespace Setting.View
         {
             IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper((Window)sender).Handle;
             int value = GetWindowLong(hwnd, GWL_STYLE);
-            SetWindowLong(hwnd, GWL_STYLE, (int)(value & ~WS_MAXIMIZEBOX));
+            SetWindowLong(hwnd, GWL_STYLE, value & ~WS_MAXIMIZEBOX);
         }
 
         #endregion
@@ -66,7 +69,7 @@ namespace Setting.View
         /// <summary>
         /// メインのビューモデル
         /// </summary>
-        private ViewModel.ViewModel MainViewModel { get; set; }
+        private ViewModel.ViewModel MainViewModel { get; }
 
         #endregion
 
@@ -77,7 +80,7 @@ namespace Setting.View
 #if x64
             string bitStr = "64bit版";
 #else
-            string bitStr = "32bit版";
+            const string bitStr = "32bit版";
 #endif
             Title += bitStr;
 
@@ -85,8 +88,8 @@ namespace Setting.View
             DataContext = MainViewModel;
             OkButton.Click += MainViewModel.OkButton_Click;
             ApplyButton.Click += MainViewModel.ApplyButton_Click;
-            resetButton.Click += MainViewModel.ResetButton_Click;
-            versionInfoButton.Click += MainViewModel.VersionInfoButton_Click;
+            ResetButton.Click += MainViewModel.ResetButton_Click;
+            VersionInfoButton.Click += MainViewModel.VersionInfoButton_Click;
 
             ApplyButton.IsEnabled = false;
 
@@ -102,11 +105,13 @@ namespace Setting.View
 
             using (RegistryKey regTokensKey = Registry.LocalMachine.OpenSubKey(Common.TokensRegKey))
             {
+                Debug.Assert(regTokensKey != null);
                 string[] tokenNames = regTokensKey.GetSubKeyNames();
                 foreach (string tokenName in tokenNames)
                 {
                     using (RegistryKey tokenKey = regTokensKey.OpenSubKey(tokenName))
                     {
+                        Debug.Assert(tokenKey != null);
                         string clsid = (string)tokenKey.GetValue(Common.RegClsid);
                         if (clsid != Common.CLSID.ToString(Common.RegClsidFormatString))
                         {
@@ -132,26 +137,28 @@ namespace Setting.View
 
             foreach (VoicevoxStyle style in styles)
             {
-                IEnumerable<TabItem> tabItems = mainTab.Items.OfType<TabItem>().Where(x => x.Header.ToString() == style.Name);
+                IEnumerable<TabItem> tabItems = MainTab.Items.OfType<TabItem>().Where(x => x.Header.ToString() == style.Name);
                 //スタイル名のタブ
                 TabControl tabControl;
-                if (tabItems.Count() == 0)
+
+                TabItem firstTabItem = tabItems.FirstOrDefault();
+                if (firstTabItem == null)
                 {
                     Binding binding = new Binding("IsChecked")
                     {
-                        ElementName = nameof(parCharacterRadioButton), Converter = new BooleanToVisibilityConverter()
+                        ElementName = nameof(ParCharacterRadioButton), Converter = new BooleanToVisibilityConverter()
                     };
                     TabItem tabItem = new TabItem { Header = style.Name };
                     tabItem.SetBinding(VisibilityProperty, binding);
 
-                    mainTab.Items.Add(tabItem);
+                    MainTab.Items.Add(tabItem);
 
                     tabControl = new TabControl();
                     tabItem.Content = tabControl;
                 }
                 else
                 {
-                    tabControl = tabItems.First().Content as TabControl;
+                    tabControl = (TabControl)firstTabItem.Content;
                 }
 
                 //int index = Array.FindIndex(MainViewModel.SpeakerParameter, x => x.ID == style.ID && x.Port == style.Port);
@@ -175,7 +182,7 @@ namespace Setting.View
 
         private void AddTabDefault()
         {
-            int defaultPort = 50021;
+            const int defaultPort = 50021;
             int id = 0;
             int index = MainViewModel.SpeakerParameter.FindIndex(x => x.ID == id && x.Port == defaultPort);
             if (index < 0)
@@ -191,13 +198,13 @@ namespace Setting.View
 
             Binding binding = new Binding("IsChecked")
             {
-                ElementName = nameof(parCharacterRadioButton), Converter = new BooleanToVisibilityConverter()
+                ElementName = nameof(ParCharacterRadioButton), Converter = new BooleanToVisibilityConverter()
             };
             TabItem tabItem = new TabItem { Header = "四国めたん" };
             tabItem.SetBinding(VisibilityProperty, binding);
             tabItem.Content = parameterSlider;
 
-            mainTab.Items.Add(tabItem);
+            MainTab.Items.Add(tabItem);
 
             id = 1;
             index = MainViewModel.SpeakerParameter.FindIndex(x => x.ID == id && x.Port == defaultPort);
@@ -216,7 +223,7 @@ namespace Setting.View
             tabItem.SetBinding(VisibilityProperty, binding);
             tabItem.Content = parameterSlider;
 
-            mainTab.Items.Add(tabItem);
+            MainTab.Items.Add(tabItem);
         }
 
         /// <summary>

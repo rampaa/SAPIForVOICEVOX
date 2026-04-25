@@ -106,7 +106,7 @@ namespace SAPIForVOICEVOX
 
         //SPEVENTENUMはフラグを直接定義しているのではなく、フラグの位置を定義してるらしい？
         //SPFEIマクロを使用して変換する必要がある？
-        private const ulong SPFEI_FLAGCHECK = (1ul << (int)SPEVENTENUM.SPEI_RESERVED1) | (1ul << (int)SPEVENTENUM.SPEI_RESERVED2);
+        private const ulong SPFEI_FLAGCHECK = (1u << (int)SPEVENTENUM.SPEI_RESERVED1) | (1ul << (int)SPEVENTENUM.SPEI_RESERVED2);
         private const ulong SPFEI_ALL_TTS_EVENTS = 0x000000000000FFFEul | SPFEI_FLAGCHECK;
         private const ulong SPFEI_ALL_SR_EVENTS = 0x003FFFFC00000000ul | SPFEI_FLAGCHECK;
         private const ulong SPFEI_ALL_EVENTS = 0xEFFFFFFFFFFFFFFFul;

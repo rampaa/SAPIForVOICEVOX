@@ -762,7 +762,7 @@ namespace StyleRegistrationTool.ViewModel
                 ExecuteMethod();
             }
 
-            private Action ExecuteMethod { get; set; }
+            private Action ExecuteMethod { get; }
         }
 
         #endregion
