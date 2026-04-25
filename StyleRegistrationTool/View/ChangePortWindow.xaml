@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StyleRegistrationTool.View"
         mc:Ignorable="d"
-        Title="ポートの変更" SizeToContent="WidthAndHeight" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        Title="ポートの変更" SizeToContent="WidthAndHeight" ResizeMode="NoResize" WindowStartupLocation="CenterOwner"
+        x:ClassModifier="internal">
     <Window.Resources>
         <local:BoolNegativeConverter x:Key="BoolConverter"/>
     </Window.Resources>

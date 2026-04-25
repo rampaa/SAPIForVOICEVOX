@@ -9,7 +9,7 @@ namespace StyleRegistrationTool.View
     /// <summary>
     /// WaitingCircle.xaml の相互作用ロジック
     /// </summary>
-    public sealed partial class WaitingCircle
+    internal sealed partial class WaitingCircle
     {
         //https://araramistudio.jimdo.com/2016/11/24/wpf%E3%81%A7waitingcircle%E3%82%B3%E3%83%B3%E3%83%88%E3%83%AD%E3%83%BC%E3%83%AB%E3%82%92%E4%BD%9C%E3%82%8B/
         //から引用
@@ -23,7 +23,7 @@ namespace StyleRegistrationTool.View
         (d, e) => { ((WaitingCircle)d).OnCircleColorPropertyChanged(e); }));
         public Color CircleColor
         {
-            get { return (Color)GetValue(CircleColorProperty); }
+            get => (Color)GetValue(CircleColorProperty);
             set { SetValue(CircleColorProperty, value); }
         }
 
@@ -70,7 +70,7 @@ namespace StyleRegistrationTool.View
             MainTrans.BeginAnimation(RotateTransform.AngleProperty, kf);
         }
 
-        public void OnCircleColorPropertyChanged(DependencyPropertyChangedEventArgs e)
+        private void OnCircleColorPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
             if (MainCanvas?.Children == null)
             {

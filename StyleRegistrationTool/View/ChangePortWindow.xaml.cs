@@ -12,14 +12,14 @@ namespace StyleRegistrationTool.View
     /// <summary>
     /// ChangePortWindow.xaml の相互作用ロジック
     /// </summary>
-    public sealed partial class ChangePortWindow : Window , INotifyPropertyChanged
+    internal sealed partial class ChangePortWindow : INotifyPropertyChanged
     {
         public ChangePortWindow(string appName, int port)
         {
             InitializeComponent();
 
             DataContext = this;
-            
+
             //プリセット作成
             portComboBox.Items.Add(new Model.NameAndPort("VOICEVOX", 50021));
             portComboBox.Items.Add(new Model.NameAndPort("VOICEVOX Nemo", 50121));
@@ -33,20 +33,20 @@ namespace StyleRegistrationTool.View
 
             SelectedPreset = new Model.NameAndPort(appName, port);
         }
-        
+
         #region INotifyPropertyChangedの実装
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private List<PropertyChangedEventArgs> propertyChangedEventArgsList = new List<PropertyChangedEventArgs>(3);
+        private readonly List<PropertyChangedEventArgs> _propertyChangedEventArgsList = new List<PropertyChangedEventArgs>(3);
 
         private void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             //eventArgsを使いまわしするための仕組み。newで逐一作成するよりも早い？？
-            PropertyChangedEventArgs eventArgs = propertyChangedEventArgsList.FirstOrDefault(x => x.PropertyName == propertyName);
+            PropertyChangedEventArgs eventArgs = _propertyChangedEventArgsList.FirstOrDefault(x => x.PropertyName == propertyName);
             if (eventArgs == null)
             {
                 eventArgs = new PropertyChangedEventArgs(propertyName);
-                propertyChangedEventArgsList.Add(eventArgs);
+                _propertyChangedEventArgsList.Add(eventArgs);
             }
             PropertyChanged?.Invoke(this, eventArgs);
         }
@@ -140,7 +140,7 @@ namespace StyleRegistrationTool.View
     /// <summary>
     /// boolを反転するコンバーター
     /// </summary>
-    public sealed class BoolNegativeConverter : IValueConverter
+    internal sealed class BoolNegativeConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
