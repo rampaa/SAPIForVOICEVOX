@@ -26,8 +26,10 @@ namespace SAPIForVOICEVOX
     [Guid(Common.GuidString)]
     [ComVisible(true)]
     [ClassInterface(ClassInterfaceType.None)]
+#pragma warning disable IDE0079 // Remove unnecessary suppression
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
+#pragma warning restore IDE0079 // Remove unnecessary suppression
     public class VoiceVoxTTSEngine : ISpTTSEngine, ISpObjectWithToken
     {
         #region ネイティブ

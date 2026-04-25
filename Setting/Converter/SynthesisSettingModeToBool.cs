@@ -8,9 +8,9 @@ namespace Setting.Converter
     internal sealed class SynthesisSettingModeToBool : IValueConverter
     {
         // ConverterParameterをEnumに変換するメソッド
-        private SynthesisSettingMode ConvertFromConverterParameter(object parameter)
+        private static SynthesisSettingMode ConvertFromConverterParameter(object parameter)
         {
-            string parameterString = parameter as string;
+            string parameterString = (string)parameter;
             return (SynthesisSettingMode)Enum.Parse(typeof(SynthesisSettingMode), parameterString);
         }
 
@@ -30,7 +30,7 @@ namespace Setting.Converter
         {
             // true→falseの変化は無視する
             // ※こうすることで、選択されたラジオボタンだけをデータに反映させる
-            if (!(bool)value)
+            if (value is bool boolValue && !boolValue)
             {
                 return System.Windows.DependencyProperty.UnsetValue;
             }
@@ -38,6 +38,6 @@ namespace Setting.Converter
             // ConverterParameterをEnumに変換して返す
             return ConvertFromConverterParameter(parameter);
         }
-        #endregion    
+        #endregion
     }
 }
