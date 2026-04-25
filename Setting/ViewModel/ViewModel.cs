@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -224,8 +223,7 @@ namespace Setting.ViewModel
         {
             SaveData();
             Window window = Window.GetWindow((Button)sender);
-            Debug.Assert(window != null);
-            window.Close();
+            window?.Close();
         }
 
         /// <summary>
@@ -245,30 +243,32 @@ namespace Setting.ViewModel
         internal void ResetButton_Click(object sender, RoutedEventArgs e)
         {
             Window window = Window.GetWindow((Button)sender);
-            Debug.Assert(window != null);
-            MessageBoxResult result = MessageBox.Show(window, "各キャラクターの調声パラメータも含めて全て初期値にリセットします。" + Environment.NewLine + "よろしいですか？", "確認", MessageBoxButton.YesNo, MessageBoxImage.Information);
-            if (result == MessageBoxResult.No)
+            if (window != null)
             {
-                return;
-            }
+                MessageBoxResult result = MessageBox.Show(window, "各キャラクターの調声パラメータも含めて全て初期値にリセットします。" + Environment.NewLine + "よろしいですか？", "確認", MessageBoxButton.YesNo, MessageBoxImage.Information);
+                if (result == MessageBoxResult.No)
+                {
+                    return;
+                }
 
-            _generalSetting = new GeneralSetting();
-            //null指定で全てのプロパティ。
-            //propertyName引数はオプション引数だがCallerMemberName属性が付いてるので、明示的に指定が必要。多分
-            RaisePropertyChanged(null);
+                _generalSetting = new GeneralSetting();
+                //null指定で全てのプロパティ。
+                //propertyName引数はオプション引数だがCallerMemberName属性が付いてるので、明示的に指定が必要。多分
+                RaisePropertyChanged(null);
 
-            BatchParameter = new SynthesisParameter();
-            for (int i = 0; i < SpeakerParameter.Count; i++)
-            {
-                SpeakerParameter[i] = new SynthesisParameter();
-            }
-            RaisePropertyChanged(nameof(SpeakerParameter));
+                BatchParameter = new SynthesisParameter();
+                for (int i = 0; i < SpeakerParameter.Count; i++)
+                {
+                    SpeakerParameter[i] = new SynthesisParameter();
+                }
+                RaisePropertyChanged(nameof(SpeakerParameter));
 
-            //適応ボタン有効化のための、プロパティ変更通知登録
-            BatchParameter.PropertyChanged += ViewModel_PropertyChanged;
-            foreach (SynthesisParameter item in SpeakerParameter)
-            {
-                item.PropertyChanged += ViewModel_PropertyChanged;
+                //適応ボタン有効化のための、プロパティ変更通知登録
+                BatchParameter.PropertyChanged += ViewModel_PropertyChanged;
+                foreach (SynthesisParameter item in SpeakerParameter)
+                {
+                    item.PropertyChanged += ViewModel_PropertyChanged;
+                }
             }
         }
 

@@ -576,39 +576,47 @@ namespace SAPIForVOICEVOX
             //四国めたん
             using (RegistryKey registryKey = Registry.LocalMachine.CreateSubKey(Common.TokensRegKey + RegName1))
             {
-                Debug.Assert(registryKey != null);
-                registryKey.SetValue("", "VOICEVOX 四国めたん");
-                registryKey.SetValue("411", "VOICEVOX 四国めたん");
-                registryKey.SetValue("CLSID", Common.CLSID.ToString(Common.RegClsidFormatString));
-                registryKey.SetValue(Common.RegSpeakerNumber, 0);
+                if (registryKey != null)
+                {
+                    registryKey.SetValue("", "VOICEVOX 四国めたん");
+                    registryKey.SetValue("411", "VOICEVOX 四国めたん");
+                    registryKey.SetValue("CLSID", Common.CLSID.ToString(Common.RegClsidFormatString));
+                    registryKey.SetValue(Common.RegSpeakerNumber, 0);
+                }
             }
             using (RegistryKey registryKey = Registry.LocalMachine.CreateSubKey(Common.TokensRegKey + RegName1 + @"\" + Common.RegAttributes))
             {
-                Debug.Assert(registryKey != null);
-                registryKey.SetValue("Age", "Teen");
-                registryKey.SetValue("Vendor", "Hiroshiba Kazuyuki");
-                registryKey.SetValue("Language", "411");
-                registryKey.SetValue("Gender", "Female");
-                registryKey.SetValue("Name", "VOICEVOX Shikoku Metan");
+                if (registryKey != null)
+                {
+                    registryKey.SetValue("Age", "Teen");
+                    registryKey.SetValue("Vendor", "Hiroshiba Kazuyuki");
+                    registryKey.SetValue("Language", "411");
+                    registryKey.SetValue("Gender", "Female");
+                    registryKey.SetValue("Name", "VOICEVOX Shikoku Metan");
+                }
             }
 
             //ずんだもん
             using (RegistryKey registryKey = Registry.LocalMachine.CreateSubKey(Common.TokensRegKey + RegName2))
             {
-                Debug.Assert(registryKey != null);
-                registryKey.SetValue("", "VOICEVOX ずんだもん");
-                registryKey.SetValue("411", "VOICEVOX ずんだもん");
-                registryKey.SetValue("CLSID", Common.CLSID.ToString(Common.RegClsidFormatString));
-                registryKey.SetValue(Common.RegSpeakerNumber, 1);
+                if (registryKey != null)
+                {
+                    registryKey.SetValue("", "VOICEVOX ずんだもん");
+                    registryKey.SetValue("411", "VOICEVOX ずんだもん");
+                    registryKey.SetValue("CLSID", Common.CLSID.ToString(Common.RegClsidFormatString));
+                    registryKey.SetValue(Common.RegSpeakerNumber, 1);
+                }
             }
             using (RegistryKey registryKey = Registry.LocalMachine.CreateSubKey(Common.TokensRegKey + RegName2 + @"\" + Common.RegAttributes))
             {
-                Debug.Assert(registryKey != null);
-                registryKey.SetValue("Age", "Child");
-                registryKey.SetValue("Vendor", "Hiroshiba Kazuyuki");
-                registryKey.SetValue("Language", "411");
-                registryKey.SetValue("Gender", "Female");
-                registryKey.SetValue("Name", "VOICEVOX Zundamon");
+                if (registryKey != null)
+                {
+                    registryKey.SetValue("Age", "Child");
+                    registryKey.SetValue("Vendor", "Hiroshiba Kazuyuki");
+                    registryKey.SetValue("Language", "411");
+                    registryKey.SetValue("Gender", "Female");
+                    registryKey.SetValue("Name", "VOICEVOX Zundamon");
+                }
             }
         }
 

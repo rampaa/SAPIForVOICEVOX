@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace SFVvCommon
@@ -62,14 +62,8 @@ namespace SFVvCommon
             return hashCode;
         }
 
-        public static bool operator ==(SapiStyle left, SapiStyle right)
-        {
-            return EqualityComparer<SapiStyle>.Default.Equals(left, right);
-        }
+        public static bool operator ==(SapiStyle left, SapiStyle right) => EqualityComparer<SapiStyle>.Default.Equals(left, right);
 
-        public static bool operator !=(SapiStyle left, SapiStyle right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(SapiStyle left, SapiStyle right) => !(left == right);
     }
 }

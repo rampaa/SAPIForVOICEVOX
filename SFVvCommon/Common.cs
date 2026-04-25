@@ -1,7 +1,6 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -46,17 +45,21 @@ namespace SFVvCommon
             //SAPIForVOICEVOXのトークンを表すキーの列挙
             using (RegistryKey regTokensKey = Registry.LocalMachine.OpenSubKey(TokensRegKey, true))
             {
-                Debug.Assert(regTokensKey != null);
-                string[] tokenNames = regTokensKey.GetSubKeyNames();
-                foreach (string tokenName in tokenNames)
+                if (regTokensKey != null)
                 {
-                    using (RegistryKey tokenKey = regTokensKey.OpenSubKey(tokenName))
+                    string[] tokenNames = regTokensKey.GetSubKeyNames();
+                    foreach (string tokenName in tokenNames)
                     {
-                        Debug.Assert(tokenKey != null);
-                        string clsid = (string)tokenKey.GetValue(RegClsid);
-                        if (clsid == CLSID.ToString(RegClsidFormatString))
+                        using (RegistryKey tokenKey = regTokensKey.OpenSubKey(tokenName))
                         {
-                            regTokensKey.DeleteSubKeyTree(tokenName);
+                            if (tokenKey != null)
+                            {
+                                string clsid = (string)tokenKey.GetValue(RegClsid);
+                                if (clsid == CLSID.ToString(RegClsidFormatString))
+                                {
+                                    regTokensKey.DeleteSubKeyTree(tokenName);
+                                }
+                            }
                         }
                     }
                 }
