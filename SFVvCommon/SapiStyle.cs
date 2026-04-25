@@ -40,18 +40,12 @@ namespace SFVvCommon
         /// <summary>
         /// sapiに表示される名前
         /// </summary>
-        public string SpaiName
-        {
-            get
-            {
-                return AppName + " " + Name + " " + StyleName;
-            }
-        }
+        public string SpaiName => AppName + " " + Name + " " + StyleName;
 
         /// <summary>
         /// SAPIForVOICEVOXモジュールのGuid
         /// </summary>
-        public Guid CLSID { get; set; }
+        public Guid CLSID { get; }
 
         public override bool Equals(object obj)
         {

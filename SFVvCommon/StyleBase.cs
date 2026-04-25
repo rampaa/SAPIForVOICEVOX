@@ -29,27 +29,27 @@ namespace SFVvCommon
         /// <summary>
         /// アプリ名
         /// </summary>
-        public string AppName { get; set; }
+        public string AppName { get; }
 
         /// <summary>
         /// 話者名
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; }
 
         /// <summary>
         /// スタイル
         /// </summary>
-        public string StyleName { get; set; }
+        public string StyleName { get; }
 
         /// <summary>
         /// ID
         /// </summary>
-        public int ID { get; set; }
+        public int ID { get; }
 
         /// <summary>
         /// ポート番号
         /// </summary>
-        public int Port { get; set; }
+        public int Port { get; }
 
         public override bool Equals(object obj)
         {
