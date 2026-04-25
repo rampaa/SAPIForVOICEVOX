@@ -124,7 +124,7 @@ namespace Setting.ViewModel
         public SynthesisParameter BatchParameter
         {
             get => _batchParameter;
-            private set
+            set
             {
                 if (_batchParameter.Equals(value))
                 {

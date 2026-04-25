@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -92,7 +92,7 @@ namespace StyleRegistrationTool.View
         public int Port
         {
             get => _port;
-            private set
+            set
             {
                 if (_port == value)
                 {
@@ -112,7 +112,7 @@ namespace StyleRegistrationTool.View
         public string AppName
         {
             get => _appName;
-            private set
+            set
             {
                 if (_appName == value)
                 {

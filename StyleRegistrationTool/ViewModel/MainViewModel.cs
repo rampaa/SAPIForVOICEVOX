@@ -17,6 +17,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Xml;
 using System.Xml.Serialization;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace StyleRegistrationTool.ViewModel
 {
@@ -135,7 +136,7 @@ namespace StyleRegistrationTool.ViewModel
         public string AppName
         {
             get => _appName;
-            private set
+            set
             {
                 if (_appName == value)
                 {
@@ -160,7 +161,7 @@ namespace StyleRegistrationTool.ViewModel
         public ObservableCollection<VoicevoxStyle> VoicevoxStyles
         {
             get => _voicevoxStyles;
-            private set
+            set
             {
                 if (_voicevoxStyles == value)
                 {
