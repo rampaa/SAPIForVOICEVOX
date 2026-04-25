@@ -8,6 +8,7 @@ namespace SFVvCommon
     /// </summary>
     public sealed class SapiStyle : StyleBase
     {
+        // ReSharper disable once UnusedMember.Global
         public SapiStyle()
         {
             CLSID = Common.CLSID;

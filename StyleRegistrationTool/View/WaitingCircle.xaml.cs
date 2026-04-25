@@ -20,11 +20,11 @@ namespace StyleRegistrationTool.View
                     typeof(Color), // プロパティの型を指定
                     typeof(WaitingCircle), // プロパティを所有する型を指定
                     new UIPropertyMetadata(Color.FromRgb(90, 117, 153),
-        (d, e) => { ((WaitingCircle)d).OnCircleColorPropertyChanged(e); }));
+        (d, _) => { ((WaitingCircle)d).OnCircleColorPropertyChanged(); }));
         public Color CircleColor
         {
             get => (Color)GetValue(CircleColorProperty);
-            set { SetValue(CircleColorProperty, value); }
+            set => SetValue(CircleColorProperty, value);
         }
 
 
@@ -70,7 +70,7 @@ namespace StyleRegistrationTool.View
             MainTrans.BeginAnimation(RotateTransform.AngleProperty, kf);
         }
 
-        private void OnCircleColorPropertyChanged(DependencyPropertyChangedEventArgs e)
+        private void OnCircleColorPropertyChanged()
         {
             if (MainCanvas?.Children == null)
             {
