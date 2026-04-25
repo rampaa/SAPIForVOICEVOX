@@ -46,7 +46,7 @@ namespace SFVvCommon
         /// <summary>
         /// SAPIForVOICEVOXモジュールのGuid
         /// </summary>
-        public Guid CLSID { get; }
+        public Guid CLSID { get; set; }
 
         public override bool Equals(object obj)
         {

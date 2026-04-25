@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+// ReSharper disable NonReadonlyMemberInGetHashCode
 
 namespace SFVvCommon
 {
@@ -29,27 +30,27 @@ namespace SFVvCommon
         /// <summary>
         /// アプリ名
         /// </summary>
-        public string AppName { get; }
+        public string AppName { get; set; }
 
         /// <summary>
         /// 話者名
         /// </summary>
-        public string Name { get; }
+        public string Name { get; set; }
 
         /// <summary>
         /// スタイル
         /// </summary>
-        public string StyleName { get; }
+        public string StyleName { get; set; }
 
         /// <summary>
         /// ID
         /// </summary>
-        public int ID { get; }
+        public int ID { get; set; }
 
         /// <summary>
         /// ポート番号
         /// </summary>
-        public int Port { get; }
+        public int Port { get; set; }
 
         public override bool Equals(object obj)
         {

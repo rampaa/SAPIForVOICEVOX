@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+// ReSharper disable NonReadonlyMemberInGetHashCode
 
 namespace StyleRegistrationTool.Model
 {
@@ -21,12 +22,12 @@ namespace StyleRegistrationTool.Model
         /// <summary>
         /// アプリ名
         /// </summary>
-        internal string Name { get; } = "";
+        internal string Name { get; set; } = "";
 
         /// <summary>
         /// ポート番号
         /// </summary>
-        internal int Port { get; } = 50021;
+        internal int Port { get; set; } = 50021;
 
         public override bool Equals(object obj)
         {
