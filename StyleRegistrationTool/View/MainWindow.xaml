@@ -7,7 +7,8 @@
         xmlns:viewModel="clr-namespace:StyleRegistrationTool.ViewModel"
         d:DataContext="{d:DesignInstance Type=viewModel:MainViewModel}"
         mc:Ignorable="d"
-        Title="スタイル登録ツール " Height="660" Width="750" MinWidth="350" MinHeight="350" WindowStartupLocation="CenterScreen" Icon="/StyleRegistrationTool;component/icon/users-alt.ico">
+        Title="スタイル登録ツール " Height="660" Width="750" MinWidth="350" MinHeight="350" WindowStartupLocation="CenterScreen" Icon="/StyleRegistrationTool;component/icon/users-alt.ico"
+        x:ClassModifier="internal">
     <Grid Margin="5">
         <!--メイン画面-->
         <Grid IsEnabled="{Binding IsMainWindowEnabled}">

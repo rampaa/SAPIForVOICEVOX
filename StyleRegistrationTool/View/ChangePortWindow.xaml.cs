@@ -12,41 +12,41 @@ namespace StyleRegistrationTool.View
     /// <summary>
     /// ChangePortWindow.xaml の相互作用ロジック
     /// </summary>
-    public sealed partial class ChangePortWindow : Window , INotifyPropertyChanged
+    internal sealed partial class ChangePortWindow : INotifyPropertyChanged
     {
         public ChangePortWindow(string appName, int port)
         {
             InitializeComponent();
 
             DataContext = this;
-            
+
             //プリセット作成
-            portComboBox.Items.Add(new Model.NameAndPort("VOICEVOX", 50021));
-            portComboBox.Items.Add(new Model.NameAndPort("VOICEVOX Nemo", 50121));
-            portComboBox.Items.Add(new Model.NameAndPort("COEIROINK", 50031));
-            portComboBox.Items.Add(new Model.NameAndPort("LMROID", 50073));
-            portComboBox.Items.Add(new Model.NameAndPort("SHAREVOX", 50025));
-            portComboBox.Items.Add(new Model.NameAndPort("ITVOICE", 49540));
-            portComboBox.Items.Add(new Model.NameAndPort("COEIROINK v2 bridge", 50132));
-            portComboBox.Items.Add(new Model.NameAndPort("AivisSpeech", 10101));
+            PortComboBox.Items.Add(new Model.NameAndPort("VOICEVOX", 50021));
+            PortComboBox.Items.Add(new Model.NameAndPort("VOICEVOX Nemo", 50121));
+            PortComboBox.Items.Add(new Model.NameAndPort("COEIROINK", 50031));
+            PortComboBox.Items.Add(new Model.NameAndPort("LMROID", 50073));
+            PortComboBox.Items.Add(new Model.NameAndPort("SHAREVOX", 50025));
+            PortComboBox.Items.Add(new Model.NameAndPort("ITVOICE", 49540));
+            PortComboBox.Items.Add(new Model.NameAndPort("COEIROINK v2 bridge", 50132));
+            PortComboBox.Items.Add(new Model.NameAndPort("AivisSpeech", 10101));
 
 
             SelectedPreset = new Model.NameAndPort(appName, port);
         }
-        
+
         #region INotifyPropertyChangedの実装
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private List<PropertyChangedEventArgs> propertyChangedEventArgsList = new List<PropertyChangedEventArgs>(3);
+        private readonly List<PropertyChangedEventArgs> _propertyChangedEventArgsList = new List<PropertyChangedEventArgs>(3);
 
         private void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             //eventArgsを使いまわしするための仕組み。newで逐一作成するよりも早い？？
-            PropertyChangedEventArgs eventArgs = propertyChangedEventArgsList.FirstOrDefault(x => x.PropertyName == propertyName);
+            PropertyChangedEventArgs eventArgs = _propertyChangedEventArgsList.FirstOrDefault(x => x.PropertyName == propertyName);
             if (eventArgs == null)
             {
                 eventArgs = new PropertyChangedEventArgs(propertyName);
-                propertyChangedEventArgsList.Add(eventArgs);
+                _propertyChangedEventArgsList.Add(eventArgs);
             }
             PropertyChanged?.Invoke(this, eventArgs);
         }
@@ -78,9 +78,9 @@ namespace StyleRegistrationTool.View
                 Port = value.Port;
                 AppName = value.Name;
                 //入力の値がプリセットに含まれていない場合、未選択にする。
-                if (!portComboBox.Items.Contains(SelectedPreset))
+                if (!PortComboBox.Items.Contains(SelectedPreset))
                 {
-                    portComboBox.SelectedIndex = -1;
+                    PortComboBox.SelectedIndex = -1;
                 }
             }
         }
@@ -92,7 +92,7 @@ namespace StyleRegistrationTool.View
         public int Port
         {
             get => _port;
-            set
+            private set
             {
                 if (_port == value)
                 {
@@ -112,7 +112,7 @@ namespace StyleRegistrationTool.View
         public string AppName
         {
             get => _appName;
-            set
+            private set
             {
                 if (_appName == value)
                 {
@@ -140,7 +140,7 @@ namespace StyleRegistrationTool.View
     /// <summary>
     /// boolを反転するコンバーター
     /// </summary>
-    public sealed class BoolNegativeConverter : IValueConverter
+    internal sealed class BoolNegativeConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

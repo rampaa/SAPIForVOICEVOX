@@ -7,12 +7,12 @@ namespace StyleRegistrationTool.Model
     /// </summary>
     public sealed class NameAndPort
     {
-        public NameAndPort()
+        internal NameAndPort()
         {
 
         }
 
-        public NameAndPort(string name, int port)
+        internal NameAndPort(string name, int port)
         {
             Name = name ?? "";
             Port = port;
@@ -21,12 +21,12 @@ namespace StyleRegistrationTool.Model
         /// <summary>
         /// アプリ名
         /// </summary>
-        public string Name { get; set; } = "";
+        internal string Name { get; } = "";
 
         /// <summary>
         /// ポート番号
         /// </summary>
-        public int Port { get; set; } = 50021;
+        internal int Port { get; } = 50021;
 
         public override bool Equals(object obj)
         {
